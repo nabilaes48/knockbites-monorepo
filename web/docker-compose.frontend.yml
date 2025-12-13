@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # Frontend only - uses existing Supabase cloud backend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: camerons-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./index.html:/app/index.html
+      - ./.env.local:/app/.env.local:ro
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0 --port 8080
+
+networks:
+  default:
+    name: camerons-network

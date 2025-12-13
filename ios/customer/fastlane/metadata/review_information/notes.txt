@@ -1,0 +1,1 @@
+This app allows customers to order food from Cameron's restaurant. Test user credentials are provided for review purposes. The app requires an internet connection to function properly.

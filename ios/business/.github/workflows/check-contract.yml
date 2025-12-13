@@ -1,0 +1,54 @@
+name: Supabase Contract Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+jobs:
+  verify-contract:
+    name: Verify Supabase Contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install -g typescript ts-node @supabase/supabase-js
+
+      - name: Run contract verification
+        id: verify
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "🔍 Verifying Supabase schema against contract..."
+          ts-node scripts/verify_supabase_contract.ts
+        continue-on-error: true
+
+      - name: Check verification result
+        if: steps.verify.outcome == 'failure'
+        run: |
+          echo "❌ CONTRACT MISMATCH DETECTED"
+          echo ""
+          echo "The Supabase schema has drifted from the documented contract."
+          echo "Please review the mismatches above and either:"
+          echo "  1. Update the database schema to match the contract"
+          echo "  2. Update docs/CAMERONS_SUPABASE_CONTRACT.md if the change is intentional"
+          echo "  3. Update SharedModels (Swift) and shared-models (TypeScript) accordingly"
+          echo ""
+          echo "See SUPABASE_CONTRACT_MAP.md for field mapping details."
+          exit 1
+
+      - name: Contract verified
+        if: steps.verify.outcome == 'success'
+        run: |
+          echo "✅ Supabase contract verification passed!"
+          echo "All tables and columns match the documented contract."

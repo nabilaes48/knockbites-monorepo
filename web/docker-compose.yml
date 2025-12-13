@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # PocketBase Backend (Supabase alternative)
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: camerons-pocketbase
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./pb_data:/pb/pb_data
+      - ./pb_migrations:/pb/pb_migrations
+      - ./pb_hooks:/pb/pb_hooks
+    environment:
+      - POCKETBASE_ADMIN_EMAIL=${ADMIN_EMAIL:-admin@camerons.com}
+      - POCKETBASE_ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme123}
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8090/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # PostgreSQL (Optional - if you prefer PostgreSQL over SQLite)
+  postgres:
+    image: postgres:16-alpine
+    container_name: camerons-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: camerons_connect
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dev_password}
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Frontend (React + Vite)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: camerons-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./index.html:/app/index.html
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8090
+      - VITE_WS_URL=ws://localhost:8090
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    command: npm run dev -- --host 0.0.0.0 --port 8080
+
+  # MinIO (S3-compatible storage for menu images)
+  minio:
+    image: minio/minio:latest
+    container_name: camerons-storage
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minioadmin}
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Redis (Optional - for session management and caching)
+  redis:
+    image: redis:7-alpine
+    container_name: camerons-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: camerons-network

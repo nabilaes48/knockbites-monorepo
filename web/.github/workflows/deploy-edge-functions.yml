@@ -1,0 +1,71 @@
+name: Deploy Edge Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/**'
+  workflow_dispatch:
+    inputs:
+      function:
+        description: 'Specific function to deploy (leave empty for all)'
+        required: false
+        default: ''
+
+env:
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Supabase project
+        run: supabase link --project-ref ${{ env.SUPABASE_PROJECT_REF }}
+
+      - name: Deploy all functions
+        if: github.event.inputs.function == ''
+        run: |
+          echo "Deploying all Edge Functions..."
+          for dir in supabase/functions/*/; do
+            if [ -f "$dir/index.ts" ]; then
+              func_name=$(basename "$dir")
+              if [ "$func_name" != "_shared" ]; then
+                echo "Deploying $func_name..."
+                supabase functions deploy "$func_name" --no-verify-jwt || echo "Failed to deploy $func_name"
+              fi
+            fi
+          done
+
+      - name: Deploy specific function
+        if: github.event.inputs.function != ''
+        run: |
+          echo "Deploying ${{ github.event.inputs.function }}..."
+          supabase functions deploy ${{ github.event.inputs.function }} --no-verify-jwt
+
+      - name: Verify deployments
+        run: supabase functions list
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Deployment status
+        run: |
+          if [ "${{ needs.deploy.result }}" == "success" ]; then
+            echo "Edge Functions deployed successfully!"
+          else
+            echo "Edge Functions deployment failed!"
+            exit 1
+          fi

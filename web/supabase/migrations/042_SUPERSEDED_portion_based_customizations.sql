@@ -1,0 +1,7 @@
+-- =====================================================
+-- ARCHIVED MIGRATION
+-- =====================================================
+-- This migration has been archived to /supabase/migrations_archived/
+-- Reason: Superseded by 042_portion_based_customizations_v2.sql
+-- Kept for historical reference; do not run in new environments.
+-- =====================================================

@@ -1,0 +1,7 @@
+-- =====================================================
+-- ARCHIVED MIGRATION
+-- =====================================================
+-- This migration has been archived to /supabase/migrations_archived/
+-- Reason: Diagnostic script, not a schema migration
+-- Kept for historical reference; do not run in new environments.
+-- =====================================================

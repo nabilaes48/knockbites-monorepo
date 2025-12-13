@@ -1,0 +1,141 @@
+name: Deploy Web App
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      build_artifact: ${{ steps.upload.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint || true
+
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_APP_ENV: ${{ github.event.inputs.environment || 'production' }}
+          VITE_APP_VERSION: ${{ github.sha }}
+
+      - name: Upload build artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+
+  # Deploy to Vercel
+  deploy-vercel:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment != 'staging' || github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+          vercel-args: '--prod'
+
+  # Alternative: Deploy to Netlify
+  # deploy-netlify:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Download build artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: dist-${{ github.sha }}
+  #         path: dist/
+  #
+  #     - name: Deploy to Netlify
+  #       uses: netlify/actions/cli@master
+  #       with:
+  #         args: deploy --prod --dir=dist
+  #       env:
+  #         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+  #         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  # Health check after deployment
+  health-check:
+    needs: deploy-vercel
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Health check
+        run: |
+          SITE_URL="${{ secrets.PRODUCTION_URL || 'https://cameronsconnect.com' }}"
+          echo "Checking $SITE_URL..."
+
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL")
+
+          if [ "$STATUS" -eq 200 ]; then
+            echo "Health check passed! Site returned $STATUS"
+          else
+            echo "Health check failed! Site returned $STATUS"
+            exit 1
+          fi
+
+      - name: API health check
+        run: |
+          SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}"
+          ANON_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}"
+
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/stores?select=id&limit=1")
+
+          if [ "$STATUS" -eq 200 ]; then
+            echo "API health check passed!"
+          else
+            echo "API health check failed! Returned $STATUS"
+            exit 1
+          fi

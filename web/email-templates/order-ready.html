@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Order is Ready! - KnockBites</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(33, 150, 243, 0.12);">
+
+          <!-- Header with Gradient -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); padding: 40px 40px 30px 40px; text-align: center;">
+              <h1 style="margin: 0; padding: 0; font-size: 32px; font-weight: 700; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                KnockBites <span style="font-size: 28px;">24-7</span> Deli
+              </h1>
+              <p style="margin: 8px 0 0 0; padding: 0; font-size: 14px; color: rgba(255,255,255,0.95); font-weight: 500;">
+                Fresh Food, Always Open
+              </p>
+            </td>
+          </tr>
+
+          <!-- Content Area -->
+          <tr>
+            <td style="padding: 40px; text-align: center;">
+              <div style="margin-bottom: 30px;">
+                <div style="display: inline-block; width: 100px; height: 100px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 50%; line-height: 100px; font-size: 50px;">
+                  🎉
+                </div>
+              </div>
+
+              <h2 style="margin: 0 0 20px 0; padding: 0; font-size: 32px; font-weight: 700; color: #2e7d32;">
+                Your Order is Ready!
+              </h2>
+
+              <p style="margin: 0 0 10px 0; padding: 0; font-size: 18px; line-height: 1.6; color: #737373;">
+                Hi {{CUSTOMER_NAME}},
+              </p>
+
+              <p style="margin: 0 0 30px 0; padding: 0; font-size: 18px; line-height: 1.6; color: #737373;">
+                Great news! Your order is ready for pickup.
+              </p>
+
+              <!-- Order Number -->
+              <div style="margin: 20px 0 30px 0; padding: 25px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 12px;">
+                <p style="margin: 0 0 8px 0; padding: 0; font-size: 14px; font-weight: 600; color: #737373; text-transform: uppercase; letter-spacing: 1px;">
+                  Order Number
+                </p>
+                <p style="margin: 0; padding: 0; font-size: 36px; font-weight: 700; color: #2e7d32; letter-spacing: 2px;">
+                  {{ORDER_NUMBER}}
+                </p>
+              </div>
+
+              <!-- Pickup Location -->
+              <div style="margin: 30px 0; padding: 25px; background-color: #fafafa; border-radius: 12px; text-align: left;">
+                <h3 style="margin: 0 0 15px 0; padding: 0; font-size: 18px; font-weight: 700; color: #262626;">
+                  📍 Pick Up Here
+                </h3>
+                <p style="margin: 0 0 10px 0; padding: 0; font-size: 18px; color: #262626; font-weight: 600;">
+                  {{STORE_NAME}}
+                </p>
+                <p style="margin: 0 0 15px 0; padding: 0; font-size: 15px; color: #737373;">
+                  {{STORE_ADDRESS}}
+                </p>
+                <p style="margin: 0; padding: 0; font-size: 15px; color: #737373;">
+                  📞 {{STORE_PHONE}}
+                </p>
+              </div>
+
+              <!-- What to Do -->
+              <div style="margin: 30px 0; padding: 25px; background-color: #fff8e1; border-radius: 12px; text-align: left;">
+                <h3 style="margin: 0 0 15px 0; padding: 0; font-size: 16px; font-weight: 700; color: #f57c00;">
+                  When You Arrive:
+                </h3>
+                <ol style="margin: 0; padding: 0 0 0 20px; font-size: 14px; line-height: 1.8; color: #737373;">
+                  <li>Go to the pickup counter</li>
+                  <li>Tell them your order number: <strong style="color: #2e7d32;">{{ORDER_NUMBER}}</strong></li>
+                  <li>Pay at the counter (cash or card)</li>
+                  <li>Enjoy your meal!</li>
+                </ol>
+              </div>
+
+              <!-- Get Directions Button -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 30px auto;">
+                <tr>
+                  <td style="border-radius: 8px; background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);">
+                    <a href="{{DIRECTIONS_URL}}" target="_blank" style="display: inline-block; padding: 18px 50px; font-size: 18px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 8px;">
+                      Get Directions
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 30px 0 0 0; padding: 0; font-size: 14px; line-height: 1.6; color: #737373;">
+                Thank you for choosing KnockBites!<br>
+                We appreciate your business. 💚
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; background-color: #262626; text-align: center;">
+              <p style="margin: 0 0 12px 0; padding: 0; font-size: 14px; color: #ffffff; font-weight: 600;">
+                KnockBites
+              </p>
+              <p style="margin: 0 0 16px 0; padding: 0; font-size: 13px; color: #a3a3a3; line-height: 1.5;">
+                Fresh deli favorites across 29 locations in New York
+              </p>
+              <p style="margin: 0; padding: 0; font-size: 11px; color: #737373;">
+                This is an automated notification. Please do not reply to this email.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

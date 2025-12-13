@@ -1,0 +1,140 @@
+name: Migration Compatibility Check
+
+# Validates that new migrations are compatible with deployed app versions
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/safe_migrations/**'
+  workflow_dispatch:
+
+env:
+  # Current deployed versions (update these when releasing new versions)
+  DEPLOYED_WEB_VERSION: '1.3.0'
+  DEPLOYED_CUSTOMER_VERSION: '1.2.0'
+  DEPLOYED_BUSINESS_VERSION: '1.2.0'
+
+jobs:
+  check-compatibility:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history to check changed files
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # Get files changed in PR
+            CHANGED=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '\.sql$' || true)
+          else
+            # Manual trigger - check all migrations
+            CHANGED="ALL"
+          fi
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+          echo "Changed SQL files:"
+          echo "$CHANGED"
+
+      - name: Check migration compatibility
+        if: steps.changed-files.outputs.changed != ''
+        run: |
+          echo "Checking migration compatibility..."
+          echo ""
+
+          # Export deployed versions for the script
+          export DEPLOYED_WEB_VERSION="${{ env.DEPLOYED_WEB_VERSION }}"
+          export DEPLOYED_CUSTOMER_VERSION="${{ env.DEPLOYED_CUSTOMER_VERSION }}"
+          export DEPLOYED_BUSINESS_VERSION="${{ env.DEPLOYED_BUSINESS_VERSION }}"
+
+          # Run the compatibility checker
+          node scripts/check-migration-compat.js
+
+      - name: Check for breaking changes in PR
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Scanning for breaking change markers..."
+
+          # Check if any changed file has @breaking: true
+          BREAKING_FILES=""
+
+          for file in ${{ steps.changed-files.outputs.changed }}; do
+            if [ -f "$file" ]; then
+              if grep -q "@breaking:\s*true" "$file"; then
+                BREAKING_FILES="$BREAKING_FILES\n- $file"
+              fi
+            fi
+          done
+
+          if [ -n "$BREAKING_FILES" ]; then
+            echo "⚠️ WARNING: Breaking changes detected in:"
+            echo -e "$BREAKING_FILES"
+            echo ""
+            echo "Breaking changes require:"
+            echo "1. Coordination with mobile team"
+            echo "2. App version updates before deployment"
+            echo "3. Explicit approval from tech lead"
+            echo ""
+            # Don't fail - just warn
+            echo "::warning::Breaking changes detected. Please ensure mobile apps are updated first."
+          else
+            echo "✓ No breaking changes detected"
+          fi
+
+      - name: Validate migration headers
+        run: |
+          echo "Validating migration headers..."
+
+          MISSING_HEADERS=0
+
+          for file in supabase/migrations/*.sql supabase/safe_migrations/*.sql; do
+            if [ -f "$file" ] && [ "$(basename "$file")" != "MIGRATION_TEMPLATE.sql" ]; then
+              # Check for required header comments
+              if ! grep -q "@requires_version:" "$file" 2>/dev/null; then
+                # Only warn for new migrations (065+)
+                MIGRATION_NUM=$(basename "$file" | grep -oE '^[0-9]+' || echo "0")
+                if [ "$MIGRATION_NUM" -ge 65 ]; then
+                  echo "⚠️ Missing @requires_version in: $file"
+                  MISSING_HEADERS=$((MISSING_HEADERS + 1))
+                fi
+              fi
+            fi
+          done
+
+          if [ $MISSING_HEADERS -gt 0 ]; then
+            echo ""
+            echo "::warning::$MISSING_HEADERS migration(s) missing required headers"
+            echo "New migrations should include:"
+            echo "  -- @requires_version: 1.x.x"
+            echo "  -- @affects: customer, business, web"
+            echo "  -- @breaking: false"
+            echo "  -- @description: Brief description"
+          else
+            echo "✓ All new migrations have required headers"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "================================"
+          echo "Migration Check Summary"
+          echo "================================"
+          echo ""
+          echo "Deployed Versions:"
+          echo "  Web:      v${{ env.DEPLOYED_WEB_VERSION }}"
+          echo "  Customer: v${{ env.DEPLOYED_CUSTOMER_VERSION }}"
+          echo "  Business: v${{ env.DEPLOYED_BUSINESS_VERSION }}"
+          echo ""
+          echo "For breaking changes, ensure:"
+          echo "1. Mobile apps are updated FIRST"
+          echo "2. schema_migrations_contract is updated"
+          echo "3. Backward compatibility is maintained"

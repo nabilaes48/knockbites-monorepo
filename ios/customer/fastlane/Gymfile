@@ -1,0 +1,6 @@
+# Gym (build) configuration
+scheme("camerons-customer-app")
+configuration("Release")
+export_method("app-store")
+output_directory("./build")
+output_name("camerons-customer-app")

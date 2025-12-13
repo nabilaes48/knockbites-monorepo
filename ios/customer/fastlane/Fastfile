@@ -1,0 +1,316 @@
+# Cameron's Customer App - Fastlane Configuration
+# https://docs.fastlane.tools
+#
+# Available lanes:
+#   fastlane ios beta          - Build and upload to TestFlight
+#   fastlane ios release       - Build and upload to App Store
+#   fastlane ios build         - Build only (no upload)
+#   fastlane ios screenshots   - Take App Store screenshots
+#   fastlane ios metadata      - Upload metadata only
+#   fastlane ios full_release  - Screenshots + metadata + build + upload
+#   fastlane ios refresh       - Update metadata and screenshots only
+
+default_platform(:ios)
+
+platform :ios do
+
+  # ==========================================
+  # BUILDING
+  # ==========================================
+
+  desc "Build only (no upload)"
+  lane :build do
+    build_app(
+      scheme: "camerons-customer-app",
+      configuration: "Release",
+      export_method: "app-store",
+      project: "camerons-customer-app.xcodeproj",
+      output_directory: "./build",
+      output_name: "camerons-customer-app"
+    )
+  end
+
+  # ==========================================
+  # TESTFLIGHT
+  # ==========================================
+
+  desc "Build and upload to App Store Connect (TestFlight)"
+  lane :beta do
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "camerons-customer-app.xcodeproj"
+    )
+
+    # Build the app with automatic code signing
+    build_app(
+      scheme: "camerons-customer-app",
+      configuration: "Release",
+      export_method: "app-store",
+      project: "camerons-customer-app.xcodeproj"
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+
+    # Clean up
+    clean_build_artifacts
+  end
+
+  # ==========================================
+  # APP STORE RELEASE
+  # ==========================================
+
+  desc "Build and upload to App Store Connect for release"
+  lane :release do
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "camerons-customer-app.xcodeproj"
+    )
+
+    # Build the app
+    build_app(
+      scheme: "camerons-customer-app",
+      configuration: "Release",
+      export_method: "app-store",
+      project: "camerons-customer-app.xcodeproj"
+    )
+
+    # Upload to App Store Connect
+    upload_to_app_store(
+      skip_screenshots: true,
+      skip_metadata: true,
+      precheck_include_in_app_purchases: false
+    )
+
+    # Clean up
+    clean_build_artifacts
+  end
+
+  # ==========================================
+  # SCREENSHOTS
+  # ==========================================
+
+  desc "Take App Store screenshots"
+  lane :screenshots do
+    # Capture screenshots using the Snapfile configuration
+    capture_screenshots(
+      scheme: "camerons-customer-appUITests",
+      output_directory: "./fastlane/screenshots",
+      clear_previous_screenshots: true,
+      devices: [
+        "iPhone 16 Pro Max",
+        "iPhone SE (3rd generation)",
+        "iPad Pro 13-inch (M4)"
+      ],
+      languages: ["en-US"],
+      concurrent_simulators: true,
+      number_of_retries: 1,
+      stop_after_first_error: false,
+      skip_open_summary: true
+    )
+  end
+
+  desc "Take screenshots for a single device (faster for testing)"
+  lane :screenshots_quick do
+    capture_screenshots(
+      project: "camerons-customer-app.xcodeproj",
+      scheme: "camerons-customer-appUITests",
+      output_directory: "./fastlane/screenshots",
+      clear_previous_screenshots: true,
+      devices: ["iPhone 16 Pro Max"],
+      languages: ["en-US"],
+      skip_open_summary: true
+    )
+  end
+
+  # ==========================================
+  # METADATA
+  # ==========================================
+
+  desc "Upload metadata only (no build, no screenshots)"
+  lane :metadata do
+    deliver(
+      skip_screenshots: true,
+      skip_binary_upload: true,
+      skip_metadata: false,
+      force: true,
+      precheck_include_in_app_purchases: false
+    )
+  end
+
+  desc "Upload screenshots only"
+  lane :upload_screenshots do
+    deliver(
+      skip_screenshots: false,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      overwrite_screenshots: true,
+      force: true
+    )
+  end
+
+  # ==========================================
+  # COMBINED WORKFLOWS
+  # ==========================================
+
+  desc "Full release: screenshots + metadata + build + upload"
+  lane :full_release do
+    # 1. Take screenshots
+    screenshots
+
+    # 2. Increment build number
+    increment_build_number(
+      xcodeproj: "camerons-customer-app.xcodeproj"
+    )
+
+    # 3. Build the app
+    build_app(
+      scheme: "camerons-customer-app",
+      configuration: "Release",
+      export_method: "app-store",
+      project: "camerons-customer-app.xcodeproj"
+    )
+
+    # 4. Upload everything
+    deliver(
+      skip_screenshots: false,
+      skip_metadata: false,
+      skip_binary_upload: false,
+      overwrite_screenshots: true,
+      force: true,
+      submit_for_review: false,
+      automatic_release: false,
+      precheck_include_in_app_purchases: false
+    )
+
+    # Clean up
+    clean_build_artifacts
+  end
+
+  desc "Refresh metadata and screenshots only (no new build)"
+  lane :refresh do
+    # Take new screenshots
+    screenshots
+
+    # Upload metadata and screenshots
+    deliver(
+      skip_screenshots: false,
+      skip_binary_upload: true,
+      skip_metadata: false,
+      overwrite_screenshots: true,
+      force: true
+    )
+  end
+
+  desc "Submit the app for App Store review"
+  lane :submit_review do
+    deliver(
+      skip_screenshots: true,
+      skip_metadata: true,
+      skip_binary_upload: true,
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        add_id_info_serves_ads: false,
+        add_id_info_tracks_action: false,
+        add_id_info_tracks_install: false,
+        content_rights_has_rights: true,
+        content_rights_contains_third_party_content: false,
+        export_compliance_uses_encryption: false,
+        export_compliance_is_exempt: false
+      }
+    )
+  end
+
+  # ==========================================
+  # UTILITIES
+  # ==========================================
+
+  desc "Increment version number (major.minor.patch)"
+  lane :bump_version do |options|
+    type = options[:type] || "patch"
+    increment_version_number(
+      xcodeproj: "camerons-customer-app.xcodeproj",
+      bump_type: type
+    )
+  end
+
+  desc "Increment build number only"
+  lane :bump_build do
+    increment_build_number(
+      xcodeproj: "camerons-customer-app.xcodeproj"
+    )
+  end
+
+  desc "Download existing metadata from App Store Connect"
+  lane :download_metadata do
+    deliver(
+      download_screenshots: true,
+      skip_binary_upload: true,
+      skip_screenshots: false,
+      skip_metadata: false,
+      force: true,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Sync certificates and provisioning profiles"
+  lane :sync_certs do
+    match(
+      type: "appstore",
+      readonly: true
+    )
+  end
+
+  desc "Register new devices"
+  lane :add_device do |options|
+    device_name = options[:name]
+    device_udid = options[:udid]
+
+    register_devices(
+      devices: {
+        device_name => device_udid
+      }
+    )
+
+    # Refresh provisioning profiles
+    match(
+      type: "development",
+      force_for_new_devices: true
+    )
+  end
+
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      scheme: "camerons-customer-app",
+      device: "iPhone 16 Pro",
+      clean: true
+    )
+  end
+
+  # ==========================================
+  # NOTIFICATIONS (Optional - configure as needed)
+  # ==========================================
+
+  after_all do |lane|
+    # This block is called after every lane finishes successfully
+    notification(
+      subtitle: "Fastlane Finished",
+      message: "Lane '#{lane}' completed successfully!"
+    )
+  end
+
+  error do |lane, exception|
+    # This block is called if there's an error in any lane
+    notification(
+      subtitle: "Fastlane Error",
+      message: "Lane '#{lane}' failed: #{exception.message}"
+    )
+  end
+
+end

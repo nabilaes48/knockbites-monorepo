@@ -1,0 +1,32 @@
+-- ============================================================================
+-- Migration Template for Cameron's Connect
+-- ============================================================================
+--
+-- REQUIRED HEADERS (for compatibility checking):
+-- @requires_version: 1.0.0          -- Minimum app version required
+-- @affects: customer, business, web  -- Which apps are affected
+-- @breaking: false                   -- Is this a breaking change?
+-- @description: Brief description    -- What this migration does
+--
+-- EXAMPLE:
+-- @requires_version: 1.3.0
+-- @affects: business, web
+-- @breaking: false
+-- @description: Add new analytics columns
+--
+-- ============================================================================
+
+-- @requires_version: 1.0.0
+-- @affects: customer, business, web
+-- @breaking: false
+-- @description: Template migration - replace with actual description
+
+-- Your migration SQL here...
+
+-- ============================================================================
+-- REMEMBER:
+-- 1. Always use IF NOT EXISTS / IF EXISTS for safety
+-- 2. Update schema_migrations_contract if this is a breaking change
+-- 3. Test on staging before production
+-- 4. Run scripts/check-migration-compat.js before merging PR
+-- ============================================================================

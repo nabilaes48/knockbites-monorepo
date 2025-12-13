@@ -1,0 +1,15 @@
+# Render Blueprint for Cameron's Connect Web App
+# Deploy to: https://render.com
+
+services:
+  - type: web
+    name: camerons-connect
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: VITE_SUPABASE_URL
+        sync: false  # Set manually in Render dashboard
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false  # Set manually in Render dashboard
+    healthCheckPath: /
+    autoDeploy: true

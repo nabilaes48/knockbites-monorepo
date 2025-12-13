@@ -1,0 +1,7 @@
+-- =====================================================
+-- ARCHIVED MIGRATION
+-- =====================================================
+-- This migration has been archived to /supabase/migrations_archived/
+-- Reason: Superseded by 041_v2_separate_customer_and_staff_signups.sql
+-- Kept for historical reference; do not run in new environments.
+-- =====================================================

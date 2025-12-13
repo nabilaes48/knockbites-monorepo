@@ -1,0 +1,54 @@
+# Snapfile - Screenshot automation configuration
+# https://docs.fastlane.tools/actions/snapshot/
+
+# Devices to capture screenshots on
+# App Store requires 6.7" (iPhone 16 Pro Max) and 6.9" (iPhone 17 Pro Max) screenshots
+devices([
+  "iPhone 16 Pro Max",     # 6.7" display - required for App Store
+  "iPhone 17 Pro Max",     # 6.9" display - required for App Store
+  "iPad Pro 13-inch (M4)"  # iPad screenshots
+])
+
+# Languages for screenshots
+languages([
+  "en-US"
+])
+
+# The scheme to use for UI tests
+scheme("camerons-customer-app")
+
+# Where to save screenshots
+output_directory("./fastlane/screenshots")
+
+# Clear previous screenshots
+clear_previous_screenshots(true)
+
+# Stop on first error
+stop_after_first_error(false)
+
+# Skip open summary
+skip_open_summary(true)
+
+# Concurrent simulators (speed up screenshot generation)
+concurrent_simulators(true)
+
+# Number of concurrent simulators
+number_of_retries(1)
+
+# Erase simulator before running
+erase_simulator(false)
+
+# Override status bar for clean screenshots
+override_status_bar(true)
+
+# Localize simulator
+localize_simulator(true)
+
+# Dark mode (set to true if you want dark mode screenshots too)
+dark_mode(false)
+
+# Project file
+project("camerons-customer-app.xcodeproj")
+
+# Test target
+test_target_name("camerons-customer-appUITests")

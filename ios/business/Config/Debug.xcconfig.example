@@ -1,0 +1,16 @@
+// Debug.xcconfig.example
+// KnockBites Business App - Debug Configuration Template
+//
+// INSTRUCTIONS:
+// 1. Copy this file to Debug.xcconfig
+// 2. Fill in the actual values
+// 3. Ensure Debug.xcconfig is in .gitignore
+//
+// NEVER commit actual credentials to git!
+
+// Supabase Configuration
+SUPABASE_URL = https:/$()/YOUR_PROJECT_REF.supabase.co
+SUPABASE_ANON_KEY = YOUR_ANON_KEY_HERE
+
+// Environment
+ENVIRONMENT = debug

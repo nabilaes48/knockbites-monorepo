@@ -1,0 +1,7 @@
+Initial release of Cameron's 24/7 ordering app.
+
+• Browse our complete menu
+• Customize your orders
+• Save favorites for quick reordering
+• Real-time order tracking
+• Find nearby store locations
