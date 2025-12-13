@@ -57,8 +57,8 @@ const SignIn = () => {
         backgroundImage: `url(${heroImage})`,
       }}
     >
-      {/* Overlay - Gold gradient for KnockBites */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FBBF24]/90 via-[#FBBF24]/70 to-[#F59E0B]/60" />
+      {/* Overlay - Dark gradient with gold accent */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/70 to-[#FBBF24]/40" />
 
       <div className="w-full max-w-md relative z-10">
         <Link
