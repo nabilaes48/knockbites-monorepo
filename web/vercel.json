@@ -3,9 +3,17 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
+    { "source": "/.well-known/(.*)", "destination": "/.well-known/$1" },
+    { "source": "/reset-password", "destination": "/reset-password/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
+    {
+      "source": "/.well-known/apple-app-site-association",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" }
+      ]
+    },
     {
       "source": "/assets/(.*)",
       "headers": [
