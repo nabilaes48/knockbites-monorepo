@@ -1,6 +1,6 @@
 //
-//  knockbites_Bussiness_appApp.swift
-//  knockbites-Bussiness-app
+//  KnockBitesBusinessApp.swift
+//  KnockBites Business
 //
 //  Created by Nabil Imran on 11/12/25.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct knockbites_Bussiness_appApp: App {
+struct KnockBitesBusinessApp: App {
     @ObservedObject private var authManager = AuthManager.shared
 
     init() {

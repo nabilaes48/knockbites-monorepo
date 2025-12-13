@@ -1,6 +1,6 @@
 //
-//  knockbites_customer_appApp.swift
-//  knockbites-customer-app
+//  KnockBitesCustomerApp.swift
+//  KnockBites Customer
 //
 //  Created by Nabil Imran on 11/12/25.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct knockbites_customer_appApp: App {
+struct KnockBitesCustomerApp: App {
     @StateObject private var authManager = AuthManager.shared
     @StateObject private var cartViewModel = CartViewModel()
     @StateObject private var favoritesViewModel = FavoritesViewModel()

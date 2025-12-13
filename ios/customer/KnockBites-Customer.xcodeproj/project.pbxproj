@@ -18,39 +18,39 @@
 			containerPortal = 87A2B74D2EC4FA4200B90BCD /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 87A2B7542EC4FA4200B90BCD;
-			remoteInfo = "camerons-customer-app";
+			remoteInfo = "KnockBites-Customer";
 		};
 		87A2B76D2EC4FA4300B90BCD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 87A2B74D2EC4FA4200B90BCD /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 87A2B7542EC4FA4200B90BCD;
-			remoteInfo = "camerons-customer-app";
+			remoteInfo = "KnockBites-Customer";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		87A2B7552EC4FA4200B90BCD /* camerons-customer-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "camerons-customer-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		87A2B7622EC4FA4300B90BCD /* camerons-customer-appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "camerons-customer-appTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		87A2B76C2EC4FA4300B90BCD /* camerons-customer-appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "camerons-customer-appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		87A2B7552EC4FA4200B90BCD /* KnockBites-Customer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KnockBites-Customer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		87A2B7622EC4FA4300B90BCD /* KnockBites-CustomerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "KnockBites-CustomerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		87A2B76C2EC4FA4300B90BCD /* KnockBites-CustomerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "KnockBites-CustomerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		87E5C0A52ECC9BBF00F0780F /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
 		87E5C0AB2ECC9C5E00F0780F /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		87A2B7572EC4FA4200B90BCD /* camerons-customer-app */ = {
+		87A2B7572EC4FA4200B90BCD /* KnockBites-Customer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "camerons-customer-app";
+			path = "KnockBites-Customer";
 			sourceTree = "<group>";
 		};
-		87A2B7652EC4FA4300B90BCD /* camerons-customer-appTests */ = {
+		87A2B7652EC4FA4300B90BCD /* KnockBites-CustomerTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "camerons-customer-appTests";
+			path = "KnockBites-CustomerTests";
 			sourceTree = "<group>";
 		};
-		87A2B76F2EC4FA4300B90BCD /* camerons-customer-appUITests */ = {
+		87A2B76F2EC4FA4300B90BCD /* KnockBites-CustomerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "camerons-customer-appUITests";
+			path = "KnockBites-CustomerUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -86,9 +86,9 @@
 			children = (
 				87E5C0A52ECC9BBF00F0780F /* SupabaseConfig.swift */,
 				87E5C0AB2ECC9C5E00F0780F /* SupabaseManager.swift */,
-				87A2B7572EC4FA4200B90BCD /* camerons-customer-app */,
-				87A2B7652EC4FA4300B90BCD /* camerons-customer-appTests */,
-				87A2B76F2EC4FA4300B90BCD /* camerons-customer-appUITests */,
+				87A2B7572EC4FA4200B90BCD /* KnockBites-Customer */,
+				87A2B7652EC4FA4300B90BCD /* KnockBites-CustomerTests */,
+				87A2B76F2EC4FA4300B90BCD /* KnockBites-CustomerUITests */,
 				87E5C0AF2ECCA06400F0780F /* Frameworks */,
 				87A2B7562EC4FA4200B90BCD /* Products */,
 			);
@@ -97,9 +97,9 @@
 		87A2B7562EC4FA4200B90BCD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				87A2B7552EC4FA4200B90BCD /* camerons-customer-app.app */,
-				87A2B7622EC4FA4300B90BCD /* camerons-customer-appTests.xctest */,
-				87A2B76C2EC4FA4300B90BCD /* camerons-customer-appUITests.xctest */,
+				87A2B7552EC4FA4200B90BCD /* KnockBites-Customer.app */,
+				87A2B7622EC4FA4300B90BCD /* KnockBites-CustomerTests.xctest */,
+				87A2B76C2EC4FA4300B90BCD /* KnockBites-CustomerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,9 +114,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		87A2B7542EC4FA4200B90BCD /* camerons-customer-app */ = {
+		87A2B7542EC4FA4200B90BCD /* KnockBites-Customer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 87A2B7762EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "camerons-customer-app" */;
+			buildConfigurationList = 87A2B7762EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "KnockBites-Customer" */;
 			buildPhases = (
 				87A2B7512EC4FA4200B90BCD /* Sources */,
 				87A2B7522EC4FA4200B90BCD /* Frameworks */,
@@ -127,19 +127,19 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				87A2B7572EC4FA4200B90BCD /* camerons-customer-app */,
+				87A2B7572EC4FA4200B90BCD /* KnockBites-Customer */,
 			);
-			name = "camerons-customer-app";
+			name = "KnockBites-Customer";
 			packageProductDependencies = (
 				87E5C0B02ECCA06400F0780F /* Supabase */,
 			);
-			productName = "camerons-customer-app";
-			productReference = 87A2B7552EC4FA4200B90BCD /* camerons-customer-app.app */;
+			productName = "KnockBites-Customer";
+			productReference = 87A2B7552EC4FA4200B90BCD /* KnockBites-Customer.app */;
 			productType = "com.apple.product-type.application";
 		};
-		87A2B7612EC4FA4300B90BCD /* camerons-customer-appTests */ = {
+		87A2B7612EC4FA4300B90BCD /* KnockBites-CustomerTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 87A2B7792EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "camerons-customer-appTests" */;
+			buildConfigurationList = 87A2B7792EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "KnockBites-CustomerTests" */;
 			buildPhases = (
 				87A2B75E2EC4FA4300B90BCD /* Sources */,
 				87A2B75F2EC4FA4300B90BCD /* Frameworks */,
@@ -151,18 +151,18 @@
 				87A2B7642EC4FA4300B90BCD /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				87A2B7652EC4FA4300B90BCD /* camerons-customer-appTests */,
+				87A2B7652EC4FA4300B90BCD /* KnockBites-CustomerTests */,
 			);
-			name = "camerons-customer-appTests";
+			name = "KnockBites-CustomerTests";
 			packageProductDependencies = (
 			);
-			productName = "camerons-customer-appTests";
-			productReference = 87A2B7622EC4FA4300B90BCD /* camerons-customer-appTests.xctest */;
+			productName = "KnockBites-CustomerTests";
+			productReference = 87A2B7622EC4FA4300B90BCD /* KnockBites-CustomerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		87A2B76B2EC4FA4300B90BCD /* camerons-customer-appUITests */ = {
+		87A2B76B2EC4FA4300B90BCD /* KnockBites-CustomerUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 87A2B77C2EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "camerons-customer-appUITests" */;
+			buildConfigurationList = 87A2B77C2EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "KnockBites-CustomerUITests" */;
 			buildPhases = (
 				87A2B7682EC4FA4300B90BCD /* Sources */,
 				87A2B7692EC4FA4300B90BCD /* Frameworks */,
@@ -174,13 +174,13 @@
 				87A2B76E2EC4FA4300B90BCD /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				87A2B76F2EC4FA4300B90BCD /* camerons-customer-appUITests */,
+				87A2B76F2EC4FA4300B90BCD /* KnockBites-CustomerUITests */,
 			);
-			name = "camerons-customer-appUITests";
+			name = "KnockBites-CustomerUITests";
 			packageProductDependencies = (
 			);
-			productName = "camerons-customer-appUITests";
-			productReference = 87A2B76C2EC4FA4300B90BCD /* camerons-customer-appUITests.xctest */;
+			productName = "KnockBites-CustomerUITests";
+			productReference = 87A2B76C2EC4FA4300B90BCD /* KnockBites-CustomerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -206,7 +206,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 87A2B7502EC4FA4200B90BCD /* Build configuration list for PBXProject "camerons-customer-app" */;
+			buildConfigurationList = 87A2B7502EC4FA4200B90BCD /* Build configuration list for PBXProject "KnockBites-Customer" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -222,9 +222,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				87A2B7542EC4FA4200B90BCD /* camerons-customer-app */,
-				87A2B7612EC4FA4300B90BCD /* camerons-customer-appTests */,
-				87A2B76B2EC4FA4300B90BCD /* camerons-customer-appUITests */,
+				87A2B7542EC4FA4200B90BCD /* KnockBites-Customer */,
+				87A2B7612EC4FA4300B90BCD /* KnockBites-CustomerTests */,
+				87A2B76B2EC4FA4300B90BCD /* KnockBites-CustomerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -282,12 +282,12 @@
 /* Begin PBXTargetDependency section */
 		87A2B7642EC4FA4300B90BCD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 87A2B7542EC4FA4200B90BCD /* camerons-customer-app */;
+			target = 87A2B7542EC4FA4200B90BCD /* KnockBites-Customer */;
 			targetProxy = 87A2B7632EC4FA4300B90BCD /* PBXContainerItemProxy */;
 		};
 		87A2B76E2EC4FA4300B90BCD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 87A2B7542EC4FA4200B90BCD /* camerons-customer-app */;
+			target = 87A2B7542EC4FA4200B90BCD /* KnockBites-Customer */;
 			targetProxy = 87A2B76D2EC4FA4300B90BCD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -426,7 +426,7 @@
 				DEVELOPMENT_TEAM = HLG9GLVFW6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cameron's uses your location to find nearby stores and show you the closest pickup options.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "KnockBites uses your location to find nearby stores and show you the closest pickup options.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -437,7 +437,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.camerons-customer.app.camerons-customer-app";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.KnockBites-Customer";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -459,7 +459,7 @@
 				DEVELOPMENT_TEAM = HLG9GLVFW6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Cameron's uses your location to find nearby stores and show you the closest pickup options.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "KnockBites uses your location to find nearby stores and show you the closest pickup options.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -470,7 +470,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.camerons-customer.app.camerons-customer-app";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.KnockBites-Customer";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -492,7 +492,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.camerons-customer.app.camerons-customer-appTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.KnockBites-CustomerTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -500,7 +500,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/camerons-customer-app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/camerons-customer-app";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KnockBites-Customer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/KnockBites-Customer";
 			};
 			name = Debug;
 		};
@@ -514,7 +514,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.camerons-customer.app.camerons-customer-appTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.KnockBites-CustomerTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -522,7 +522,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/camerons-customer-app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/camerons-customer-app";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KnockBites-Customer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/KnockBites-Customer";
 			};
 			name = Release;
 		};
@@ -534,7 +534,7 @@
 				DEVELOPMENT_TEAM = HLG9GLVFW6;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.camerons-customer.app.camerons-customer-appUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.KnockBites-CustomerUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -542,7 +542,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "camerons-customer-app";
+				TEST_TARGET_NAME = "KnockBites-Customer";
 			};
 			name = Debug;
 		};
@@ -554,7 +554,7 @@
 				DEVELOPMENT_TEAM = HLG9GLVFW6;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.camerons-customer.app.camerons-customer-appUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.KnockBites-CustomerUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -562,14 +562,14 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "camerons-customer-app";
+				TEST_TARGET_NAME = "KnockBites-Customer";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		87A2B7502EC4FA4200B90BCD /* Build configuration list for PBXProject "camerons-customer-app" */ = {
+		87A2B7502EC4FA4200B90BCD /* Build configuration list for PBXProject "KnockBites-Customer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				87A2B7742EC4FA4300B90BCD /* Debug */,
@@ -578,7 +578,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		87A2B7762EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "camerons-customer-app" */ = {
+		87A2B7762EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "KnockBites-Customer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				87A2B7772EC4FA4300B90BCD /* Debug */,
@@ -587,7 +587,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		87A2B7792EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "camerons-customer-appTests" */ = {
+		87A2B7792EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "KnockBites-CustomerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				87A2B77A2EC4FA4300B90BCD /* Debug */,
@@ -596,7 +596,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		87A2B77C2EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "camerons-customer-appUITests" */ = {
+		87A2B77C2EC4FA4300B90BCD /* Build configuration list for PBXNativeTarget "KnockBites-CustomerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				87A2B77D2EC4FA4300B90BCD /* Debug */,
