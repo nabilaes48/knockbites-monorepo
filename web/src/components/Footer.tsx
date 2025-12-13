@@ -9,9 +9,9 @@ export const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <img src="/knockbites-logo.png" alt="KnockBites" className="h-10 w-10 rounded-lg bg-white p-0.5" />
+              <img src="/knockbites-logo-dark.png" alt="KnockBites" className="h-10 w-10 rounded-lg" />
               <h3 className="text-2xl font-bold">
-                <span className="text-[#FBBF24]">Knock</span><span className="text-[#EC4899]">Bites</span>
+                <span className="text-[#FBBF24]">Knock</span><span className="text-white">Bites</span>
               </h3>
             </div>
             <p className="text-gray-400 mb-4">

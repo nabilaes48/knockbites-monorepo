@@ -18,9 +18,10 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/knockbites-logo.png" alt="KnockBites" className="h-10 w-10 rounded-lg dark:bg-white dark:p-0.5" />
+            <img src="/knockbites-logo.png" alt="KnockBites" className="h-10 w-10 rounded-lg dark:hidden" />
+            <img src="/knockbites-logo-dark.png" alt="KnockBites" className="h-10 w-10 rounded-lg hidden dark:block" />
             <span className="text-2xl font-bold">
-              <span className="text-[#FBBF24]">Knock</span><span className="text-[#EC4899]">Bites</span>
+              <span className="text-[#FBBF24]">Knock</span><span className="text-foreground">Bites</span>
             </span>
           </Link>
 
