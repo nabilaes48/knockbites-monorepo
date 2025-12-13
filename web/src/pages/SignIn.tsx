@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Store, ArrowLeft, UserPlus } from "lucide-react";
+import { ArrowLeft, UserPlus } from "lucide-react";
 import heroImage from "@/assets/hero-food.jpg";
 
 const SignIn = () => {
@@ -57,8 +57,8 @@ const SignIn = () => {
         backgroundImage: `url(${heroImage})`,
       }}
     >
-      {/* Overlay - Orange to Pink gradient for KnockBites */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FF8C42]/90 via-[#FF8C42]/70 to-[#E84393]/60" />
+      {/* Overlay - Gold gradient for KnockBites */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FBBF24]/90 via-[#FBBF24]/70 to-[#F59E0B]/60" />
 
       <div className="w-full max-w-md relative z-10">
         <Link
@@ -71,11 +71,9 @@ const SignIn = () => {
 
         <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[#FF8C42] to-[#E84393] mx-auto mb-4 shadow-lg">
-              <Store className="h-8 w-8 text-white" />
-            </div>
+            <img src="/knockbites-logo.png" alt="KnockBites" className="w-16 h-16 rounded-xl mx-auto mb-4 shadow-lg" />
             <CardTitle className="text-3xl text-gray-900">
-              KnockBites <span className="text-[#FF8C42]">24-7</span> Deli
+              <span className="text-[#FBBF24]">Knock</span>Bites
             </CardTitle>
             <CardDescription className="text-gray-600">Sign in to your account</CardDescription>
           </CardHeader>
@@ -93,7 +91,7 @@ const SignIn = () => {
                     setCredentials({ ...credentials, email: e.target.value })
                   }
                   required
-                  className="border-gray-300 focus:border-[#FF8C42] focus:ring-[#FF8C42]"
+                  className="border-gray-300 focus:border-[#FBBF24] focus:ring-[#FBBF24]"
                 />
               </div>
 
@@ -108,14 +106,14 @@ const SignIn = () => {
                     setCredentials({ ...credentials, password: e.target.value })
                   }
                   required
-                  className="border-gray-300 focus:border-[#FF8C42] focus:ring-[#FF8C42]"
+                  className="border-gray-300 focus:border-[#FBBF24] focus:ring-[#FBBF24]"
                 />
               </div>
 
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-gradient-to-r from-[#FF8C42] to-[#E84393] hover:from-[#F57C00] hover:to-[#D63384] text-white font-semibold shadow-md hover:shadow-lg transition-all"
+                className="w-full bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] hover:from-[#D97706] hover:to-[#B45309] text-white font-semibold shadow-md hover:shadow-lg transition-all"
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Sign In"}
@@ -127,16 +125,16 @@ const SignIn = () => {
                 Don't have an account?{" "}
                 <Link
                   to="/signup"
-                  className="text-[#FF8C42] hover:text-[#F57C00] hover:underline font-semibold"
+                  className="text-[#FBBF24] hover:text-[#D97706] hover:underline font-semibold"
                 >
                   Sign up
                 </Link>
               </p>
             </div>
 
-            <div className="mt-6 p-4 bg-gradient-to-br from-[#FF8C42]/5 to-[#E84393]/5 border border-[#FF8C42]/20 rounded-xl">
+            <div className="mt-6 p-4 bg-gradient-to-br from-[#FBBF24]/5 to-[#F59E0B]/5 border border-[#FBBF24]/20 rounded-xl">
               <p className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                <UserPlus className="h-4 w-4 text-[#FF8C42]" />
+                <UserPlus className="h-4 w-4 text-[#FBBF24]" />
                 New Customer?
               </p>
               <p className="text-xs text-gray-600 mb-3">
@@ -145,7 +143,7 @@ const SignIn = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full border-[#FF8C42] text-[#FF8C42] hover:bg-[#FF8C42] hover:text-white transition-colors"
+                className="w-full border-[#FBBF24] text-[#FBBF24] hover:bg-[#FBBF24] hover:text-white transition-colors"
                 onClick={() => navigate("/signup")}
               >
                 Create Account
@@ -155,7 +153,7 @@ const SignIn = () => {
             <div className="mt-4 text-center">
               <Link
                 to="/dashboard/login"
-                className="text-xs text-gray-500 hover:text-[#FF8C42] transition-colors"
+                className="text-xs text-gray-500 hover:text-[#FBBF24] transition-colors"
               >
                 Staff? Sign in here →
               </Link>
