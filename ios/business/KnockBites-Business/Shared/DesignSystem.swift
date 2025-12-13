@@ -1,6 +1,6 @@
 //
 //  DesignSystem.swift
-//  knockbites-Bussiness-app
+//  KnockBites Business
 //
 //  Created by Claude Code on 11/12/25.
 //  Updated Phase 9 - Added button styles, animation durations, and standardized tokens
@@ -10,8 +10,9 @@ import SwiftUI
 
 // MARK: - Colors
 extension Color {
-    static let brandPrimary = Color.blue // Can be customized in Assets catalog
-    static let brandSecondary = Color.orange
+    // KnockBites Brand Orange #F5A623
+    static let brandPrimary = Color(red: 245/255, green: 166/255, blue: 35/255)
+    static let brandSecondary = Color(red: 255/255, green: 149/255, blue: 0/255) // iOS Orange
 
     static let success = Color.green
     static let warning = Color.orange

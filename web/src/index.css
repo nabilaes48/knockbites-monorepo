@@ -6,7 +6,8 @@
 @tailwind utilities;
 
 /* ============================================
-   CAMERON'S CONNECT DESIGN SYSTEM
+   KNOCKBITES DESIGN SYSTEM
+   Brand Color: Orange/Gold #F5A623
    Dual Theme: Apple-like Light + Futuristic Dark
    ============================================ */
 
@@ -30,8 +31,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
 
-    /* iOS System Colors */
-    --primary: 211 100% 50%;           /* iOS Blue #007AFF */
+    /* KnockBites Brand Color */
+    --primary: 37 92% 55%;             /* KnockBites Orange #F5A623 */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 96%;          /* Light gray background */
@@ -58,7 +59,7 @@
     --border: 0 0% 90%;
     --border-light: 0 0% 94%;
     --input: 0 0% 90%;
-    --ring: 211 100% 50%;
+    --ring: 37 92% 55%;                /* KnockBites Orange */
 
     /* Radius - Apple uses generous rounding */
     --radius: 1rem;
@@ -88,7 +89,7 @@
     --glow-cyan: none;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(211 100% 50%) 0%, hsl(142 71% 45%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(37 92% 55%) 0%, hsl(28 100% 50%) 100%); /* KnockBites Orange */
     --gradient-background: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
 
     /* Overlays */

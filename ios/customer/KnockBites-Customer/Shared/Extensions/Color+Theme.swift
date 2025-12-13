@@ -1,6 +1,6 @@
 //
 //  Color+Theme.swift
-//  knockbites-customer-app
+//  KnockBites Customer
 //
 //  Created by Claude Code on 11/12/25.
 //
@@ -9,8 +9,8 @@ import SwiftUI
 
 extension Color {
     // MARK: - Primary Brand Colors
-    static let brandPrimary = Color(hex: "2563EB") // Blue
-    static let brandSecondary = Color(hex: "10B981") // Green
+    static let brandPrimary = Color(hex: "F5A623") // KnockBites Orange
+    static let brandSecondary = Color(hex: "FF9500") // iOS Orange
 
     // MARK: - Semantic Colors
     static let success = Color(hex: "10B981")
