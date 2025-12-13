@@ -52,3 +52,6 @@ supabase/.temp/
 # Misc
 *.log
 *.tmp
+# iOS Supabase Config - DO NOT COMMIT
+ios/customer/SupabaseConfig.swift
+ios/business/SupabaseConfig.swift

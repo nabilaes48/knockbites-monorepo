@@ -91,9 +91,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string) => {
     try {
-      // First, try to fetch from user_profiles (business users) as it's more common for dashboard access
+      // First, try to fetch from staff_profiles (business users) as it's more common for dashboard access
       const { data: businessData, error: businessError } = await supabase
-        .from('user_profiles')
+        .from('staff_profiles')
         .select('*')
         .eq('id', userId)
         .single()

@@ -18,7 +18,7 @@ export function StoreAssignmentPanel() {
         .from("store_assignments")
         .select(`
           *,
-          user_profiles (full_name, role),
+          staff_profiles (full_name, role),
           stores (name, city)
         `)
         .order("created_at", { ascending: false });
@@ -85,7 +85,7 @@ export function StoreAssignmentPanel() {
                       className="text-sm text-gray-300 flex items-center gap-2"
                     >
                       <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                      {(assignment.user_profiles as any)?.full_name}
+                      {(assignment.staff_profiles as any)?.full_name}
                       {assignment.is_primary_store && (
                         <Badge className="text-xs bg-purple-600">Primary</Badge>
                       )}

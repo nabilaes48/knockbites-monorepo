@@ -59,7 +59,7 @@ export function UserManagementPanel() {
 
       // Fetch user profiles
       const { data: profiles, error: profilesError } = await supabase
-        .from("user_profiles")
+        .from("staff_profiles")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -110,7 +110,7 @@ export function UserManagementPanel() {
     try {
       // Deactivate user instead of deleting
       const { error } = await supabase
-        .from("user_profiles")
+        .from("staff_profiles")
         .update({ is_active: false })
         .eq("id", userId);
 
@@ -134,7 +134,7 @@ export function UserManagementPanel() {
   const handleToggleActive = async (user: UserProfile) => {
     try {
       const { error } = await supabase
-        .from("user_profiles")
+        .from("staff_profiles")
         .update({ is_active: !user.is_active })
         .eq("id", user.id);
 

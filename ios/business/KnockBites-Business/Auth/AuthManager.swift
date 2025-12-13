@@ -151,7 +151,7 @@ class AuthManager: ObservableObject {
         do {
             // Fetch the raw response
             let data: Data = try await supabase
-                .from("user_profiles")
+                .from("staff_profiles")
                 .select()
                 .eq("id", value: userId)
                 .single()

@@ -19,7 +19,7 @@ export function SystemAnalytics() {
     try {
       // Count users
       const { count: userCount } = await supabase
-        .from("user_profiles")
+        .from("staff_profiles")
         .select("*", { count: "exact", head: true });
 
       // Count orders

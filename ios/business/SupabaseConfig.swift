@@ -1,9 +1,9 @@
 import Foundation
 
 enum SupabaseConfig {
-    // Supabase connection
-    static let url = "https://jwcuebbhkwwilqfblecq.supabase.co"
-    static let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3Y3VlYmJoa3d3aWxxZmJsZWNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MzYxODksImV4cCI6MjA3OTAxMjE4OX0.z03hYyyIIyfdj42Le4XeJFSK2vnd4cHvsaLA03CNM7I"
+    // KnockBites Staging Project
+    static let url = "https://dsmefhuhflixoevexafm.supabase.co"
+    static let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzbWVmaHVoZmxpeG9ldmV4YWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1OTMzNjQsImV4cCI6MjA4MTE2OTM2NH0.tp-ddm8D9H4P_CLaM7ZZtKZ2DzpH2iPeDJjlj4C2P2E"
 
     // Store Information - Highland Mills Snack Shop Inc (Jay's Deli)
     static let storeId = 1

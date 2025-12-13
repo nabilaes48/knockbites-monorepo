@@ -283,7 +283,7 @@ export type Database = {
             foreignKeyName: "coupons_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: "user_profiles"
+            referencedRelation: "staff_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1295,7 +1295,7 @@ export type Database = {
             foreignKeyName: "push_notifications_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: "user_profiles"
+            referencedRelation: "staff_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1700,7 +1700,7 @@ export type Database = {
         }
         Relationships: []
       }
-      user_profiles: {
+      staff_profiles: {
         Row: {
           assigned_stores: number[] | null
           avatar_url: string | null
@@ -1757,14 +1757,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "user_profiles_store_id_fkey"
+            foreignKeyName: "staff_profiles_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "analytics_store_summary"
             referencedColumns: ["store_id"]
           },
           {
-            foreignKeyName: "user_profiles_store_id_fkey"
+            foreignKeyName: "staff_profiles_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"

@@ -16,7 +16,7 @@ enum TableNames {
     static let orderItems = "order_items"
     static let menuItems = "menu_items"
     static let menuCategories = "menu_categories"
-    static let userProfiles = "user_profiles"
+    static let staffProfiles = "staff_profiles"
     static let staff = "staff"
 
     // MARK: - Loyalty Tables

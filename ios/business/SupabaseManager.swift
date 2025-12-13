@@ -354,7 +354,7 @@ class SupabaseManager {
         return enrichedOrders
     }
 
-    /// Enrich orders with actual user names from the user_profiles table
+    /// Enrich orders with actual user names from the staff_profiles table
     private func enrichOrdersWithUserNames(_ orders: [Order]) async -> [Order] {
         // Get unique user IDs
         let userIds = Array(Set(orders.map { $0.userId }))
@@ -362,14 +362,14 @@ class SupabaseManager {
         guard !userIds.isEmpty else { return orders }
 
         do {
-            // Fetch user profiles from user_profiles table
+            // Fetch user profiles from staff_profiles table
             struct UserProfileResponse: Codable {
                 let id: String
                 let full_name: String
             }
 
             let profiles: [UserProfileResponse] = try await client
-                .from("user_profiles")
+                .from("staff_profiles")
                 .select("id, full_name")
                 .in("id", values: userIds)
                 .execute()
