@@ -49,7 +49,7 @@ export default {
         },
         // KnockBites Brand Colors
         brand: {
-          orange: "hsl(var(--brand-orange, 25 95% 53%))",
+          gold: "hsl(var(--brand-gold, 45 93% 56%))",
           pink: "hsl(var(--brand-pink, 330 81% 60%))",
         },
         // iOS System Colors

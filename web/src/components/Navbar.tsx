@@ -20,7 +20,7 @@ export const Navbar = () => {
           <Link to="/" className="flex items-center space-x-2">
             <img src="/knockbites-logo.png" alt="KnockBites" className="h-10 w-10 rounded-lg dark:bg-white dark:p-0.5" />
             <span className="text-2xl font-bold">
-              <span className="text-[#F97316]">Knock</span><span className="text-[#EC4899]">Bites</span>
+              <span className="text-[#FBBF24]">Knock</span><span className="text-[#EC4899]">Bites</span>
             </span>
           </Link>
 

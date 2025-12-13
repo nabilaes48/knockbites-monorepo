@@ -7,7 +7,7 @@
 
 /* ============================================
    KNOCKBITES DESIGN SYSTEM
-   Brand Colors: Coral Orange #F97316 → Pink #EC4899
+   Brand Colors: Gold #FBBF24 → Pink #EC4899
    Dual Theme: Apple-like Light + Futuristic Dark
    ============================================ */
 
@@ -32,9 +32,9 @@
     --popover-foreground: 0 0% 9%;
 
     /* KnockBites Brand Colors */
-    --primary: 25 95% 53%;             /* KnockBites Coral Orange #F97316 */
-    --primary-foreground: 0 0% 100%;
-    --brand-orange: 25 95% 53%;        /* #F97316 - "Knock" */
+    --primary: 45 93% 56%;             /* KnockBites Gold #FBBF24 */
+    --primary-foreground: 0 0% 0%;
+    --brand-gold: 45 93% 56%;          /* #FBBF24 - "Knock" */
     --brand-pink: 330 81% 60%;         /* #EC4899 - "Bites" */
 
     --secondary: 220 14% 96%;          /* Light gray background */
@@ -61,7 +61,7 @@
     --border: 0 0% 90%;
     --border-light: 0 0% 94%;
     --input: 0 0% 90%;
-    --ring: 25 95% 53%;                /* KnockBites Coral Orange */
+    --ring: 45 93% 56%;                /* KnockBites Gold */
 
     /* Radius - Apple uses generous rounding */
     --radius: 1rem;
@@ -91,8 +91,8 @@
     --glow-cyan: none;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(330 81% 60%) 100%); /* KnockBites Orange → Pink */
-    --gradient-brand: linear-gradient(90deg, hsl(25 95% 53%) 0%, hsl(330 81% 60%) 100%); /* Logo gradient */
+    --gradient-hero: linear-gradient(135deg, hsl(45 93% 56%) 0%, hsl(330 81% 60%) 100%); /* KnockBites Gold → Pink */
+    --gradient-brand: linear-gradient(90deg, hsl(45 93% 56%) 0%, hsl(330 81% 60%) 100%); /* Logo gradient */
     --gradient-background: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
 
     /* Overlays */
@@ -150,7 +150,7 @@
     --neon-blue: 217 91% 60%;           /* #3b82f6 */
 
     /* KnockBites Brand in Dark Mode */
-    --brand-orange: 25 95% 53%;         /* #F97316 */
+    --brand-gold: 45 93% 56%;           /* #FBBF24 */
     --brand-pink: 330 81% 60%;          /* #EC4899 */
 
     /* Borders & Inputs */
