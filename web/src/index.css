@@ -7,7 +7,7 @@
 
 /* ============================================
    KNOCKBITES DESIGN SYSTEM
-   Brand Color: Orange/Gold #F5A623
+   Brand Colors: Coral Orange #F97316 → Pink #EC4899
    Dual Theme: Apple-like Light + Futuristic Dark
    ============================================ */
 
@@ -31,9 +31,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
 
-    /* KnockBites Brand Color */
-    --primary: 37 92% 55%;             /* KnockBites Orange #F5A623 */
+    /* KnockBites Brand Colors */
+    --primary: 25 95% 53%;             /* KnockBites Coral Orange #F97316 */
     --primary-foreground: 0 0% 100%;
+    --brand-orange: 25 95% 53%;        /* #F97316 - "Knock" */
+    --brand-pink: 330 81% 60%;         /* #EC4899 - "Bites" */
 
     --secondary: 220 14% 96%;          /* Light gray background */
     --secondary-foreground: 0 0% 9%;
@@ -59,7 +61,7 @@
     --border: 0 0% 90%;
     --border-light: 0 0% 94%;
     --input: 0 0% 90%;
-    --ring: 37 92% 55%;                /* KnockBites Orange */
+    --ring: 25 95% 53%;                /* KnockBites Coral Orange */
 
     /* Radius - Apple uses generous rounding */
     --radius: 1rem;
@@ -89,7 +91,8 @@
     --glow-cyan: none;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(37 92% 55%) 0%, hsl(28 100% 50%) 100%); /* KnockBites Orange */
+    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(330 81% 60%) 100%); /* KnockBites Orange → Pink */
+    --gradient-brand: linear-gradient(90deg, hsl(25 95% 53%) 0%, hsl(330 81% 60%) 100%); /* Logo gradient */
     --gradient-background: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
 
     /* Overlays */
@@ -141,10 +144,14 @@
     /* Neon Accent Colors */
     --neon-cyan: 187 100% 50%;          /* #00f0ff */
     --neon-purple: 265 89% 66%;         /* #a855f7 */
-    --neon-pink: 330 100% 65%;          /* #ff4d94 */
+    --neon-pink: 330 81% 60%;           /* #EC4899 - KnockBites Pink */
     --neon-green: 142 76% 50%;          /* #22c55e */
-    --neon-orange: 24 100% 55%;         /* #ff7700 */
+    --neon-orange: 25 95% 53%;          /* #F97316 - KnockBites Orange */
     --neon-blue: 217 91% 60%;           /* #3b82f6 */
+
+    /* KnockBites Brand in Dark Mode */
+    --brand-orange: 25 95% 53%;         /* #F97316 */
+    --brand-pink: 330 81% 60%;          /* #EC4899 */
 
     /* Borders & Inputs */
     --border: 222 47% 18%;

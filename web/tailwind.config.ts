@@ -47,6 +47,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // KnockBites Brand Colors
+        brand: {
+          orange: "hsl(var(--brand-orange, 25 95% 53%))",
+          pink: "hsl(var(--brand-pink, 330 81% 60%))",
+        },
         // iOS System Colors
         ios: {
           blue: "hsl(var(--primary))",
@@ -71,6 +76,7 @@ export default {
       },
       backgroundImage: {
         'gradient-hero': 'var(--gradient-hero)',
+        'gradient-brand': 'var(--gradient-brand)',
         'gradient-background': 'var(--gradient-background)',
         'gradient-card': 'var(--gradient-card)',
         'gradient-border': 'var(--gradient-border)',
