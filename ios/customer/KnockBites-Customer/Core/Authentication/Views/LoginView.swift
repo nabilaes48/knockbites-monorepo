@@ -24,9 +24,12 @@ struct LoginView: View {
                     VStack(spacing: Spacing.xl) {
                         // Logo/Header
                         VStack(spacing: Spacing.md) {
-                            Image(systemName: "fork.knife.circle.fill")
-                                .font(.system(size: 80))
-                                .foregroundColor(.brandPrimary)
+                            Image("BrandLogo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .clipShape(RoundedRectangle(cornerRadius: 22))
+                                .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
 
                             Text("Welcome Back!")
                                 .font(AppFonts.largeTitle)

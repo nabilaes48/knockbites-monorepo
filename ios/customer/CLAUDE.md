@@ -4,24 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Cameron's Customer App is an iOS application built with SwiftUI and Swift 5.0 for ordering food from Cameron's restaurants. Targets iOS 17.0+ and supports iPhone/iPad.
+KnockBites Customer App is an iOS application built with SwiftUI for ordering food from KnockBites restaurants. Targets iOS 17.0+ and supports iPhone/iPad.
 
-**Bundle Identifier:** `com.camerons-customer.app.camerons-customer-app`
+**Project Name:** `KnockBites-Customer`
+**Bundle Identifier:** `com.knockbites.customer`
 
 ## Building and Running
 
 ```bash
 # Build the app
-xcodebuild -project camerons-customer-app.xcodeproj -scheme camerons-customer-app -configuration Debug build
+xcodebuild -project KnockBites-Customer.xcodeproj -scheme KnockBites-Customer -configuration Debug build
 
 # Run all tests (unit + UI)
-xcodebuild test -project camerons-customer-app.xcodeproj -scheme camerons-customer-app -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project KnockBites-Customer.xcodeproj -scheme KnockBites-Customer -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run a specific test class
-xcodebuild test -project camerons-customer-app.xcodeproj -scheme camerons-customer-app -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:'camerons-customer-appTests/camerons_customer_appTests'
+xcodebuild test -project KnockBites-Customer.xcodeproj -scheme KnockBites-Customer -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:'KnockBites-CustomerTests/knockbites_customer_appTests'
 
 # Clean build
-xcodebuild clean -project camerons-customer-app.xcodeproj -scheme camerons-customer-app
+xcodebuild clean -project KnockBites-Customer.xcodeproj -scheme KnockBites-Customer
 ```
 
 ## Fastlane (App Store Deployment)
@@ -83,11 +84,11 @@ fastlane ios add_device name:"Device Name" udid:"UDID"
 ## Project Structure
 
 ```
-camerons-customer-app/
+KnockBites-Customer/
 ├── SupabaseConfig.swift              # Supabase URL, keys, imageURL(from:) helper
 ├── SupabaseManager.swift             # Singleton for all database operations
-├── camerons-customer-app/
-│   ├── camerons_customer_appApp.swift    # App entry point (@main)
+├── KnockBites-Customer/
+│   ├── KnockBitesCustomerApp.swift   # App entry point (@main)
 │   ├── Core/                         # Feature modules (MVVM pattern)
 │   │   ├── Authentication/           # Login, signup, AuthManager singleton
 │   │   ├── Home/                     # MainTabView, store selector
@@ -95,17 +96,16 @@ camerons-customer-app/
 │   │   ├── Cart/                     # CartViewModel, checkout
 │   │   ├── Orders/                   # Order history, tracking
 │   │   ├── Favorites/                # Saved favorite items
-│   │   ├── Rewards/                  # Loyalty program
-│   │   └── Profile/                  # User settings, preferences
+│   │   └── Profile/                  # User settings, addresses, preferences
 │   ├── Shared/
-│   │   ├── Components/               # Reusable UI (PortionSelectorButton, etc.)
+│   │   ├── Components/               # Reusable UI (PortionSelectorButton, ToastView, etc.)
 │   │   ├── DTOs/                     # Data Transfer Objects for Supabase
 │   │   ├── Extensions/               # Color+Theme, View+Extensions
 │   │   ├── Services/                 # RealtimeManager for live order updates
-│   │   └── Utilities/                # Models.swift, Constants, Notifications
+│   │   └── Utilities/                # Models.swift, Constants, AppSettings, Notifications
 │   └── Assets.xcassets/
-├── camerons-customer-appTests/       # Swift Testing framework (@Test, #expect)
-└── database-migrations/              # SQL migration files
+├── KnockBites-CustomerTests/         # Swift Testing framework (@Test, #expect)
+└── KnockBites-CustomerUITests/       # UI tests and screenshot automation
 ```
 
 ## Architecture
@@ -113,14 +113,14 @@ camerons-customer-app/
 ### MVVM Pattern
 Each `Core/` feature module has `Views/`, `ViewModels/` (`@MainActor ObservableObject`), and optionally `Models/`. Shared models are in `Shared/Utilities/Models.swift`.
 
-### App Entry Point (`camerons_customer_appApp.swift`)
+### App Entry Point (`KnockBitesCustomerApp.swift`)
 - **Auth Flow**: `LoginView` → `StoreSelectionWrapper` → `MainTabView`
 - **Global State** via `@EnvironmentObject`:
   - `AuthManager`: Supabase Auth singleton, observes `authStateChanges`
   - `CartViewModel`: Cart + selected store
   - `FavoritesViewModel`, `ProfileViewModel`, `PaymentMethodViewModel`
 - **Settings**: `AppSettings.shared` via custom environment key
-- **Singletons**: `AuthManager.shared`, `AppSettings.shared`, `ToastManager.shared`, `SupabaseManager.shared`
+- **Singletons**: `AuthManager.shared`, `AppSettings.shared`, `ToastManager.shared`, `SupabaseManager.shared`, `RealtimeManager.shared`
 
 ### Supabase Integration
 - **SupabaseManager**: Singleton for all database operations
@@ -131,12 +131,14 @@ Each `Core/` feature module has `Views/`, `ViewModels/` (`@MainActor ObservableO
 - `fetchStores()`, `fetchMenuItems()`, `fetchCategories()`
 - `fetchMenuItemCustomizations(for:)`: Portion-based customizations
 - `submitOrder()`: Returns `(orderId: String, orderNumber: String)`
+- `getUserFavorites()`, `toggleFavorite(menuItemId:)`
+- `getUserAddresses()`, `addAddress()`, `updateAddress()`, `deleteAddress()`
 
 ### UI & Design System
 - **Design Tokens**: `Constants.swift` (`AppFonts`, `Spacing`, `CornerRadius`)
 - **Theme**: `Color+Theme.swift` for semantic colors
 - **Toast**: `ToastManager.shared.show(message, icon, type)`, add `.withToast()` modifier
-- **Loading**: `.loading(viewModel.isLoading)` modifier for overlays
+- **Notifications**: `Notification.Name.orderStatusChanged` for realtime updates
 
 ### Key Data Models (`Models.swift`)
 - **MenuItem**: Price, dietary info, `customizationGroups`, `portionCustomizations`
@@ -144,10 +146,11 @@ Each `Core/` feature module has `Views/`, `ViewModels/` (`@MainActor ObservableO
 - **PortionLevel**: `.none`, `.light`, `.regular`, `.extra` with emoji indicators
 - **MenuItemCustomization**: Portion-based customizations with tiered pricing
 - **Order**: Status tracking, `orderNumber` (human-readable)
+- **Address**: User delivery addresses with label, full address, and delivery instructions
 
 ### Swift Configuration
 - Swift 5.0, iOS 17.0+
-- MainActor by default (`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`)
+- Xcode 26.0+
 - Swift Testing framework (`@Test`, `#expect(...)`)
 
 ## Development Patterns
@@ -160,7 +163,7 @@ Each `Core/` feature module has `Views/`, `ViewModels/` (`@MainActor ObservableO
 
 ### Authentication
 - `AuthManager.shared` singleton manages auth via Supabase
-- Sign up creates user + customer profile in `customer_profiles`
+- Sign up creates user + customer profile in `customers`
 - Session auto-persists via Supabase SDK
 - Auth state: `@Published var isAuthenticated: Bool`
 
@@ -198,7 +201,7 @@ portionSelections: [Int: PortionLevel] // customizationId: portion
 **UI Components** in `Shared/Components/`:
 - `PortionSelectorButton`: 4-level selector (None/Light/Regular/Extra)
 - `IngredientRow`: Ingredient name + portion buttons
-- `CategorySection`: Groups by category (🥗 Vegetables, 🥫 Sauces, ✨ Extras)
+- `CategorySection`: Groups by category (vegetables, sauces, extras)
 
 **Pricing**:
 - Free items (vegetables, sauces): $0 at all portions
@@ -208,6 +211,7 @@ portionSelections: [Int: PortionLevel] // customizationId: portion
 Uses Swift Testing framework:
 ```swift
 import Testing
+@testable import knockbites_customer_app
 
 @Test func example() async throws {
     #expect(condition)

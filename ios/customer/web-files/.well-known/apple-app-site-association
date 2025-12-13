@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "HLG9GLVFW6.com.knockbites.KnockBites-Customer",
+        "paths": ["/auth/*", "/reset-password", "/reset-password/*"]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["HLG9GLVFW6.com.knockbites.KnockBites-Customer"]
+  }
+}

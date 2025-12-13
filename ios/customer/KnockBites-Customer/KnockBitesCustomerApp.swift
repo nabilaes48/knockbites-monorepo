@@ -15,27 +15,49 @@ struct KnockBitesCustomerApp: App {
     @StateObject private var profileViewModel = ProfileViewModel()
     @StateObject private var paymentMethodViewModel = PaymentMethodViewModel()
     @StateObject private var appSettings = AppSettings.shared
+    @State private var showSplash = true
+    @State private var showResetPassword = false
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if authManager.isAuthenticated {
-                    StoreSelectionWrapper()
-                        .environmentObject(cartViewModel)
-                        .environmentObject(favoritesViewModel)
-                        .environmentObject(profileViewModel)
-                        .environmentObject(paymentMethodViewModel)
-                        .environment(\.appSettings, appSettings)
-                        .preferredColorScheme(appSettings.colorScheme)
-                        .withToast()
-                } else {
-                    LoginView()
-                        .environment(\.appSettings, appSettings)
-                        .preferredColorScheme(appSettings.colorScheme)
-                        .withToast()
+            ZStack {
+                Group {
+                    if authManager.isAuthenticated {
+                        StoreSelectionWrapper()
+                            .environmentObject(cartViewModel)
+                            .environmentObject(favoritesViewModel)
+                            .environmentObject(profileViewModel)
+                            .environmentObject(paymentMethodViewModel)
+                            .environment(\.appSettings, appSettings)
+                            .preferredColorScheme(appSettings.colorScheme)
+                            .withToast()
+                    } else {
+                        LoginView()
+                            .environment(\.appSettings, appSettings)
+                            .preferredColorScheme(appSettings.colorScheme)
+                            .withToast()
+                    }
+                }
+                .environmentObject(authManager)
+
+                // Splash screen overlay
+                if showSplash {
+                    SplashView {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showSplash = false
+                        }
+                    }
+                    .transition(.opacity)
+                    .zIndex(1)
                 }
             }
-            .environmentObject(authManager)
+            .preferredColorScheme(appSettings.colorScheme)
+            .onOpenURL { url in
+                handleDeepLink(url: url)
+            }
+            .sheet(isPresented: $showResetPassword) {
+                ResetPasswordView()
+            }
         }
     }
 
@@ -43,6 +65,29 @@ struct KnockBitesCustomerApp: App {
         // Test Supabase connection on app launch
         Task {
             await SupabaseManager.shared.testConnection()
+        }
+    }
+
+    private func handleDeepLink(url: URL) {
+        print("📱 Deep link received: \(url)")
+        print("   Scheme: \(url.scheme ?? "nil")")
+        print("   Host: \(url.host ?? "nil")")
+        print("   Path: \(url.path)")
+
+        // Handle password reset - both custom scheme and Universal Link
+        let isCustomScheme = url.scheme == "knockbites"
+        let isUniversalLink = url.host == "knockbites.com" && url.path.contains("reset-password")
+
+        if isCustomScheme || isUniversalLink {
+            print("✅ Reset password URL detected, showing reset view")
+
+            // Try to restore session from URL (may fail, that's ok)
+            Task {
+                _ = await authManager.handleDeepLink(url: url)
+            }
+
+            // Always show reset password screen
+            showResetPassword = true
         }
     }
 }

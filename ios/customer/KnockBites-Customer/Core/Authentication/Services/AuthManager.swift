@@ -173,8 +173,46 @@ class AuthManager: ObservableObject {
             throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Please enter a valid email address"])
         }
 
-        try await supabase.auth.resetPasswordForEmail(email)
+        // Use Universal Link to redirect back to the app via knockbites.com
+        try await supabase.auth.resetPasswordForEmail(
+            email,
+            redirectTo: URL(string: "https://knockbites.com/reset-password")
+        )
         print("✅ Password reset email sent to: \(email)")
+    }
+
+    // MARK: - Update Password
+
+    func updatePassword(newPassword: String) async throws {
+        guard newPassword.count >= 6 else {
+            throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Password must be at least 6 characters"])
+        }
+
+        do {
+            try await supabase.auth.update(user: .init(password: newPassword))
+            print("✅ Password updated successfully")
+        } catch {
+            print("❌ Password update error: \(error)")
+            throw NSError(domain: "AuthManager", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to update password. Please try again."])
+        }
+    }
+
+    // MARK: - Handle Deep Link
+
+    func handleDeepLink(url: URL) async -> Bool {
+        // Handle both custom scheme (knockbites://) and Universal Links (https://knockbites.com)
+        let isValidScheme = url.scheme == "knockbites" || url.scheme == "https"
+        guard isValidScheme else { return false }
+
+        do {
+            // Let Supabase handle the session from the URL
+            _ = try await supabase.auth.session(from: url)
+            print("✅ Session restored from deep link")
+            return true
+        } catch {
+            print("❌ Deep link handling error: \(error)")
+            return false
+        }
     }
 
     // MARK: - Sign Out
