@@ -18,9 +18,9 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/favicon.svg" alt="KnockBites" className="h-10 w-10" />
+            <img src="/knockbites-logo.png" alt="KnockBites" className="h-10 w-10 rounded-lg dark:bg-white dark:p-0.5" />
             <span className="text-2xl font-bold">
-              <span className="text-[#FF8C42]">Knock</span><span className="text-[#E84393]">Bites</span>
+              <span className="text-[#F97316]">Knock</span><span className="text-[#EC4899]">Bites</span>
             </span>
           </Link>
 
@@ -47,7 +47,7 @@ export const Navbar = () => {
               size="icon"
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="text-foreground hover:text-[#FF8C42]"
+              className="text-foreground hover:text-[#F97316]"
             >
               {theme === "dark" ? (
                 <Sun className="h-5 w-5" />
@@ -66,7 +66,7 @@ export const Navbar = () => {
               </Button>
             </Link>
             <Link to="/order">
-              <Button className="bg-[#FF8C42] hover:bg-[#F57C00] text-white">
+              <Button className="bg-[#F97316] hover:bg-[#EA580C] text-white">
                 Order Now
               </Button>
             </Link>
@@ -116,7 +116,7 @@ export const Navbar = () => {
             <div className="pt-4 space-y-2">
               <Button
                 variant="outline"
-                className="w-full border-[#FF8C42] text-[#FF8C42]"
+                className="w-full border-[#F97316] text-[#F97316]"
                 onClick={() => {
                   toggleTheme();
                   setIsOpen(false);
@@ -140,7 +140,7 @@ export const Navbar = () => {
                 </Button>
               </Link>
               <Link to="/order" className="block">
-                <Button className="w-full bg-[#FF8C42] hover:bg-[#F57C00] text-white" onClick={() => setIsOpen(false)}>
+                <Button className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white" onClick={() => setIsOpen(false)}>
                   Order Now
                 </Button>
               </Link>

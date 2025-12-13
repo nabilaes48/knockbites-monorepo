@@ -9,9 +9,9 @@ export const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <img src="/favicon.svg" alt="KnockBites" className="h-10 w-10" />
+              <img src="/knockbites-logo.png" alt="KnockBites" className="h-10 w-10 rounded-lg bg-white p-0.5" />
               <h3 className="text-2xl font-bold">
-                <span className="text-[#FF8C42]">Knock</span><span className="text-[#E84393]">Bites</span>
+                <span className="text-[#F97316]">Knock</span><span className="text-[#EC4899]">Bites</span>
               </h3>
             </div>
             <p className="text-gray-400 mb-4">
@@ -22,7 +22,7 @@ export const Footer = () => {
                 href="https://facebook.com/knockbites"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#FF8C42] transition-colors"
+                className="text-gray-400 hover:text-[#F97316] transition-colors"
                 aria-label="Follow us on Facebook"
               >
                 <Facebook className="h-5 w-5" />
@@ -31,7 +31,7 @@ export const Footer = () => {
                 href="https://instagram.com/knockbites"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#FF8C42] transition-colors"
+                className="text-gray-400 hover:text-[#F97316] transition-colors"
                 aria-label="Follow us on Instagram"
               >
                 <Instagram className="h-5 w-5" />
@@ -40,7 +40,7 @@ export const Footer = () => {
                 href="https://twitter.com/knockbites"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#FF8C42] transition-colors"
+                className="text-gray-400 hover:text-[#F97316] transition-colors"
                 aria-label="Follow us on Twitter"
               >
                 <Twitter className="h-5 w-5" />
@@ -53,22 +53,22 @@ export const Footer = () => {
             <h4 className="text-lg font-semibold mb-4 text-gray-100">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/menu" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/menu" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   Menu
                 </Link>
               </li>
               <li>
-                <Link to="/locations" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/locations" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   Locations
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/about" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/contact" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   Contact
                 </Link>
               </li>
@@ -80,27 +80,27 @@ export const Footer = () => {
             <h4 className="text-lg font-semibold mb-4 text-gray-100">Customer Service</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/faq" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/faq" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/customer/dashboard" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/customer/dashboard" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   Order History
                 </Link>
               </li>
               <li>
-                <Link to="/privacy-policy" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/privacy-policy" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms-of-service" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/terms-of-service" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link to="/cookie-policy" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Link to="/cookie-policy" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   Cookie Policy
                 </Link>
               </li>
@@ -112,20 +112,20 @@ export const Footer = () => {
             <h4 className="text-lg font-semibold mb-4 text-gray-100">Contact Us</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
-                <Phone className="h-5 w-5 mt-0.5 flex-shrink-0 text-[#FF8C42]" />
-                <a href="tel:1-800-KNOCKBITES" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Phone className="h-5 w-5 mt-0.5 flex-shrink-0 text-[#F97316]" />
+                <a href="tel:1-800-KNOCKBITES" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   1-800-KNOCKBITES
                 </a>
               </li>
               <li className="flex items-start gap-2">
-                <Mail className="h-5 w-5 mt-0.5 flex-shrink-0 text-[#FF8C42]" />
-                <a href="mailto:support@knockbites.com" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <Mail className="h-5 w-5 mt-0.5 flex-shrink-0 text-[#F97316]" />
+                <a href="mailto:support@knockbites.com" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   support@knockbites.com
                 </a>
               </li>
               <li className="flex items-start gap-2">
-                <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0 text-[#FF8C42]" />
-                <Link to="/locations" className="text-gray-400 hover:text-[#FF8C42] transition-colors">
+                <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0 text-[#F97316]" />
+                <Link to="/locations" className="text-gray-400 hover:text-[#F97316] transition-colors">
                   View our locations
                 </Link>
               </li>
