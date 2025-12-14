@@ -96,7 +96,15 @@ const SignIn = () => {
               </div>
 
               <div>
-                <Label htmlFor="password" className="text-gray-700">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-gray-700">Password</Label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs text-[#FBBF24] hover:text-[#D97706] hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <Input
                   id="password"
                   type="password"

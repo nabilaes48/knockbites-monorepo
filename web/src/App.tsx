@@ -17,6 +17,7 @@ const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const SignIn = lazy(() => import("./pages/SignIn"));
 const SignUp = lazy(() => import("./pages/SignUp"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const Order = lazy(() => import("./pages/Order"));
 const OrderTracking = lazy(() => import("./pages/OrderTracking"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/order" element={<Order />} />
                 <Route path="/order/tracking/:orderId" element={<OrderTracking />} />
                 <Route path="/dashboard" element={<Dashboard />} />
