@@ -200,14 +200,59 @@ class AuthManager: ObservableObject {
     // MARK: - Handle Deep Link
 
     func handleDeepLink(url: URL) async -> Bool {
-        // Handle both custom scheme (knockbites://) and Universal Links (https://knockbites.com)
-        let isValidScheme = url.scheme == "knockbites" || url.scheme == "https"
-        guard isValidScheme else { return false }
+        print("🔗 Handling deep link: \(url)")
 
+        // Extract tokens from URL query parameters
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let queryItems = components?.queryItems ?? []
+
+        var accessToken: String?
+        var refreshToken: String?
+
+        for item in queryItems {
+            if item.name == "access_token" {
+                accessToken = item.value
+            } else if item.name == "refresh_token" {
+                refreshToken = item.value
+            }
+        }
+
+        // Also check fragment (hash) for tokens
+        if let fragment = components?.fragment {
+            let fragmentItems = fragment.split(separator: "&")
+            for item in fragmentItems {
+                let parts = item.split(separator: "=", maxSplits: 1)
+                if parts.count == 2 {
+                    let key = String(parts[0])
+                    let value = String(parts[1])
+                    if key == "access_token" {
+                        accessToken = value
+                    } else if key == "refresh_token" {
+                        refreshToken = value
+                    }
+                }
+            }
+        }
+
+        print("   Access token: \(accessToken != nil ? "found" : "not found")")
+        print("   Refresh token: \(refreshToken != nil ? "found" : "not found")")
+
+        // If we have tokens, set the session manually
+        if let accessToken = accessToken {
+            do {
+                try await supabase.auth.setSession(accessToken: accessToken, refreshToken: refreshToken ?? "")
+                print("✅ Session set from tokens")
+                isAuthenticated = true
+                return true
+            } catch {
+                print("❌ Failed to set session: \(error)")
+            }
+        }
+
+        // Fallback: try Supabase's built-in URL handling
         do {
-            // Let Supabase handle the session from the URL
             _ = try await supabase.auth.session(from: url)
-            print("✅ Session restored from deep link")
+            print("✅ Session restored from deep link URL")
             return true
         } catch {
             print("❌ Deep link handling error: \(error)")

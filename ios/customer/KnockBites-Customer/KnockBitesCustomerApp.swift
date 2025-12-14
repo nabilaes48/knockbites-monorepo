@@ -79,15 +79,17 @@ struct KnockBitesCustomerApp: App {
         let isUniversalLink = url.host == "knockbites.com" && url.path.contains("reset-password")
 
         if isCustomScheme || isUniversalLink {
-            print("✅ Reset password URL detected, showing reset view")
+            print("✅ Reset password URL detected")
 
-            // Try to restore session from URL (may fail, that's ok)
+            // Restore session from URL, then show reset view
             Task {
-                _ = await authManager.handleDeepLink(url: url)
-            }
+                let success = await authManager.handleDeepLink(url: url)
+                print("   Session restore: \(success ? "success" : "failed")")
 
-            // Always show reset password screen
-            showResetPassword = true
+                await MainActor.run {
+                    showResetPassword = true
+                }
+            }
         }
     }
 }
