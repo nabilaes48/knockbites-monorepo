@@ -33,7 +33,7 @@ interface Order {
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
-  const { user, profile, isCustomer, signOut } = useAuth();
+  const { user, profile, isCustomer, signOut, loading } = useAuth();
 
   // Use Supabase-backed rewards hook
   const { rewards: dbRewards, transactions: dbTransactions, loading: rewardsLoading, refresh: refreshRewards, lifetimePoints } = useRewards();
@@ -110,8 +110,18 @@ const CustomerDashboard = () => {
     window.location.href = "/";
   };
 
+  // Wait for auth to finish loading before checking
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF8C42]"></div>
+      </div>
+    );
+  }
+
+  // Redirect if not logged in as customer
   if (!isLoggedIn || userRole !== "customer") {
-    return <Navigate to="/dashboard/login" replace />;
+    return <Navigate to="/signin" replace />;
   }
 
   const favoriteItems = [
