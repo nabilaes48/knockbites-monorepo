@@ -148,6 +148,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .maybeSingle()
 
+      console.log('Customer query result:', { customerData, customerError, userId })
+
       // Check if this fetch is still current
       if (thisVersion !== fetchVersionRef.current) {
         console.log('Stale fetch (customers), ignoring. thisVersion:', thisVersion, 'current:', fetchVersionRef.current)
@@ -167,7 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // If neither profile exists, set loading false but no profile
-      console.log('No profile found in either table, version:', thisVersion)
+      console.log('No profile found in either table, version:', thisVersion, 'customerError:', customerError)
       setLoading(false)
 
     } catch (error) {
