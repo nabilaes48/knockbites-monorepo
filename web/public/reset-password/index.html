@@ -201,13 +201,17 @@
         const refreshToken = hashParams.get('refresh_token') || urlParams.get('refresh_token');
         const type = hashParams.get('type') || urlParams.get('type');
 
-        // Build app deep link with tokens
+        console.log('Tokens found:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+
+        // Build app deep link with tokens (URL encode them for safety)
         let appUrl = 'knockbites://reset-password';
         if (accessToken) {
-            appUrl += `?access_token=${accessToken}`;
-            if (refreshToken) appUrl += `&refresh_token=${refreshToken}`;
-            if (type) appUrl += `&type=${type}`;
+            appUrl += `?access_token=${encodeURIComponent(accessToken)}`;
+            if (refreshToken) appUrl += `&refresh_token=${encodeURIComponent(refreshToken)}`;
+            if (type) appUrl += `&type=${encodeURIComponent(type)}`;
         }
+
+        console.log('App URL:', appUrl);
 
         // Set up open app button
         document.getElementById('open-app-btn').href = appUrl;
@@ -220,6 +224,11 @@
                 access_token: accessToken,
                 refresh_token: refreshToken || ''
             });
+        } else {
+            // No tokens - show reset form directly
+            console.log('No tokens found, showing reset form');
+            document.getElementById('opening-app').querySelector('h1').textContent = 'Reset Your Password';
+            document.getElementById('opening-app').querySelector('p').textContent = 'No session token found. Please reset your password below or request a new reset link.';
         }
 
         function showResetForm() {
