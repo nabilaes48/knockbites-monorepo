@@ -92,11 +92,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = async (userId: string) => {
     try {
       // First, try to fetch from staff_profiles (business users) as it's more common for dashboard access
+      // Using maybeSingle() instead of single() to avoid 406 errors when no rows found
       const { data: businessData, error: businessError } = await supabase
         .from('staff_profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       // If business user found, set business profile
       if (businessData && !businessError) {
@@ -115,11 +116,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // If not a business user, try to fetch from customers table
+      // Using maybeSingle() instead of single() to avoid 406 errors when no rows found
       const { data: customerData, error: customerError } = await supabase
         .from('customers')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       // If customer found, set customer profile
       if (customerData && !customerError) {
