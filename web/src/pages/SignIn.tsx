@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,12 +12,28 @@ import heroImage from "@/assets/hero-food.jpg";
 const SignIn = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signIn } = useAuth();
+  const { signIn, user, profile, loading, isCustomer } = useAuth();
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [justSignedIn, setJustSignedIn] = useState(false);
+
+  // Redirect after sign-in when profile is loaded
+  useEffect(() => {
+    if (justSignedIn && !loading && user && profile) {
+      // Redirect based on role
+      if (isCustomer) {
+        navigate("/customer/dashboard");
+      } else {
+        // Staff/admin users go to business dashboard
+        navigate("/dashboard");
+      }
+      setJustSignedIn(false);
+      setIsLoading(false);
+    }
+  }, [justSignedIn, loading, user, profile, isCustomer, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,21 +41,12 @@ const SignIn = () => {
 
     try {
       await signIn(credentials.email, credentials.password);
+      setJustSignedIn(true);
 
       toast({
         title: "Welcome back!",
         description: "You have been signed in successfully",
       });
-
-      // Wait a moment for profile to load, then check role
-      setTimeout(() => {
-        // Get the user profile from AuthContext to determine redirect
-        const profile = JSON.parse(localStorage.getItem('supabase.auth.token') || '{}');
-
-        // For now, navigate to customer dashboard
-        // In production, you'd check the role from AuthContext
-        navigate("/customer/dashboard");
-      }, 500);
     } catch (error: any) {
       toast({
         title: "Sign in failed",
@@ -47,6 +54,7 @@ const SignIn = () => {
         variant: "destructive",
       });
       setIsLoading(false);
+      setJustSignedIn(false);
     }
   };
 
