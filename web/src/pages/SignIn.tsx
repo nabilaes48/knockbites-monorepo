@@ -20,15 +20,20 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [justSignedIn, setJustSignedIn] = useState(false);
 
-  // Redirect after sign-in when profile is loaded
+  // Redirect after sign-in when auth loading is complete
   useEffect(() => {
-    if (justSignedIn && !loading && user && profile) {
+    if (justSignedIn && !loading && user) {
       // Redirect based on role
-      if (isCustomer) {
-        navigate("/customer/dashboard");
+      if (profile) {
+        if (isCustomer) {
+          navigate("/customer/dashboard");
+        } else {
+          // Staff/admin users go to business dashboard
+          navigate("/dashboard");
+        }
       } else {
-        // Staff/admin users go to business dashboard
-        navigate("/dashboard");
+        // User exists but no profile - go to home page
+        navigate("/");
       }
       setJustSignedIn(false);
       setIsLoading(false);

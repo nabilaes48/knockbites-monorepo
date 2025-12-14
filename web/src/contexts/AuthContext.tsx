@@ -75,17 +75,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) {
-        // Set loading to true while we fetch the profile
+
+      // Only fetch profile on actual sign-in, not on every auth event
+      if (event === 'SIGNED_IN' && session?.user) {
         setLoading(true)
         fetchProfile(session.user.id)
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         setProfile(null)
         setLoading(false)
       }
+      // Ignore other events like TOKEN_REFRESHED, INITIAL_SESSION (handled by getSession)
     })
 
     return () => subscription.unsubscribe()
