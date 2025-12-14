@@ -22,9 +22,12 @@ const SignIn = () => {
 
   // Redirect after sign-in when auth loading is complete
   useEffect(() => {
+    console.log('SignIn useEffect:', { justSignedIn, loading, user: !!user, profile: !!profile, isCustomer });
+
     if (justSignedIn && !loading && user) {
       // Redirect based on role
       if (profile) {
+        console.log('Redirecting to:', isCustomer ? '/customer/dashboard' : '/dashboard');
         if (isCustomer) {
           navigate("/customer/dashboard");
         } else {
@@ -33,6 +36,7 @@ const SignIn = () => {
         }
       } else {
         // User exists but no profile - go to home page
+        console.log('No profile found, redirecting to home');
         navigate("/");
       }
       setJustSignedIn(false);

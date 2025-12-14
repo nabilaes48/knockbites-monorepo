@@ -72,22 +72,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
+    // Track if we've already fetched profile for this user
+    let currentUserId: string | null = null
+
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth event:', event, 'User:', session?.user?.id)
       setSession(session)
       setUser(session?.user ?? null)
 
-      // Only fetch profile on actual sign-in, not on every auth event
-      if (event === 'SIGNED_IN' && session?.user) {
-        setLoading(true)
-        fetchProfile(session.user.id)
-      } else if (event === 'SIGNED_OUT') {
+      if (session?.user) {
+        // Only fetch profile if user changed or on sign-in
+        if (session.user.id !== currentUserId || event === 'SIGNED_IN') {
+          currentUserId = session.user.id
+          setLoading(true)
+          fetchProfile(session.user.id)
+        }
+      } else {
+        currentUserId = null
         setProfile(null)
         setLoading(false)
       }
-      // Ignore other events like TOKEN_REFRESHED, INITIAL_SESSION (handled by getSession)
     })
 
     return () => subscription.unsubscribe()
