@@ -60,6 +60,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Track the current fetch to handle race conditions
+  const fetchVersionRef = { current: 0 }
+
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -101,6 +104,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const fetchProfile = async (userId: string) => {
+    // Increment version to track this fetch
+    const thisVersion = ++fetchVersionRef.current
+    console.log('fetchProfile starting, version:', thisVersion, 'userId:', userId)
+
     try {
       // First, try to fetch from staff_profiles (business users) as it's more common for dashboard access
       // Using maybeSingle() instead of single() to avoid 406 errors when no rows found
@@ -109,6 +116,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select('*')
         .eq('id', userId)
         .maybeSingle()
+
+      // Check if this fetch is still current
+      if (thisVersion !== fetchVersionRef.current) {
+        console.log('Stale fetch (staff), ignoring. thisVersion:', thisVersion, 'current:', fetchVersionRef.current)
+        return
+      }
 
       // If business user found, set business profile
       if (businessData && !businessError) {
@@ -121,6 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           can_hire_roles: Array.isArray(businessData.can_hire_roles) ? businessData.can_hire_roles : [],
           is_system_admin: businessData.is_system_admin || false,
         }
+        console.log('Setting business profile, version:', thisVersion)
         setProfile(profileData)
         setLoading(false)
         return
@@ -134,26 +148,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .maybeSingle()
 
+      // Check if this fetch is still current
+      if (thisVersion !== fetchVersionRef.current) {
+        console.log('Stale fetch (customers), ignoring. thisVersion:', thisVersion, 'current:', fetchVersionRef.current)
+        return
+      }
+
       // If customer found, set customer profile
       if (customerData && !customerError) {
         const customerProfile: CustomerProfile = {
           ...customerData,
           role: 'customer',
         }
+        console.log('Setting customer profile, version:', thisVersion)
         setProfile(customerProfile)
         setLoading(false)
         return
       }
 
-      // If neither profile exists, silently fall through
-      // This is expected for users who exist in auth but not yet in profile tables
+      // If neither profile exists, set loading false but no profile
+      console.log('No profile found in either table, version:', thisVersion)
+      setLoading(false)
 
     } catch (error) {
       console.error('Error fetching profile:', error)
-      // If profile doesn't exist in either table, it might still be creating
-      // Don't treat this as a fatal error for new signups
-    } finally {
-      setLoading(false)
+      // Only set loading false if this is still the current fetch
+      if (thisVersion === fetchVersionRef.current) {
+        setLoading(false)
+      }
     }
   }
 
