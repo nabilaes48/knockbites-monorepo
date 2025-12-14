@@ -168,8 +168,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      // If neither profile exists, set loading false but no profile
-      console.log('No profile found in either table, version:', thisVersion, 'customerError:', customerError)
+      // If no profile exists, try to create a customer profile
+      // This handles users who signed up before the trigger was in place
+      console.log('No profile found, attempting to create customer profile for:', userId)
+
+      // Get user email from auth
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+
+      if (authUser && thisVersion === fetchVersionRef.current) {
+        const { data: newCustomer, error: createError } = await supabase
+          .from('customers')
+          .insert({
+            id: userId,
+            email: authUser.email,
+            full_name: authUser.user_metadata?.full_name || 'Customer',
+            phone: authUser.user_metadata?.phone || null,
+          })
+          .select()
+          .single()
+
+        if (newCustomer && !createError) {
+          console.log('Created customer profile:', newCustomer)
+          const customerProfile: CustomerProfile = {
+            ...newCustomer,
+            role: 'customer',
+          }
+          setProfile(customerProfile)
+          setLoading(false)
+          return
+        } else {
+          console.log('Failed to create customer profile:', createError)
+        }
+      }
+
+      // If still no profile, set loading false
+      console.log('No profile found and could not create one, version:', thisVersion)
       setLoading(false)
 
     } catch (error) {
