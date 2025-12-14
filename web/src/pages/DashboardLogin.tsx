@@ -28,13 +28,8 @@ const DashboardLogin = () => {
     if (user) {
       // If profile loaded
       if (profile) {
-        // If customer tries to access business dashboard, redirect to customer dashboard
+        // If customer signs in here, redirect them to customer dashboard
         if (profile.role === 'customer') {
-          toast({
-            title: "Access Denied",
-            description: "Customers cannot access the business dashboard. Please use the customer portal.",
-            variant: "destructive",
-          });
           navigate("/customer/dashboard");
           setIsLoading(false);
           setJustLoggedIn(false);
