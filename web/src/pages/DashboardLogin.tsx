@@ -21,28 +21,39 @@ const DashboardLogin = () => {
 
   // Auto-redirect or block based on profile
   useEffect(() => {
-    if (!loading && profile && user) {
-      // If customer tries to access business dashboard, redirect to customer dashboard
-      if (profile.role === 'customer') {
+    // Wait for auth to finish loading
+    if (loading) return;
+
+    // If user is logged in
+    if (user) {
+      // If profile loaded
+      if (profile) {
+        // If customer tries to access business dashboard, redirect to customer dashboard
+        if (profile.role === 'customer') {
+          toast({
+            title: "Access Denied",
+            description: "Customers cannot access the business dashboard. Please use the customer portal.",
+            variant: "destructive",
+          });
+          navigate("/customer/dashboard");
+          setIsLoading(false);
+          setJustLoggedIn(false);
+          return;
+        }
+
+        // Business user - redirect to dashboard
+        navigate("/dashboard");
+        setIsLoading(false);
+        setJustLoggedIn(false);
+      } else if (justLoggedIn) {
+        // User logged in but no profile found - they don't have staff access
         toast({
           title: "Access Denied",
-          description: "Customers cannot access the business dashboard",
+          description: "You don't have staff access. Please request staff access or contact an administrator.",
           variant: "destructive",
         });
-        navigate("/customer/dashboard");
         setIsLoading(false);
-        return;
-      }
-
-      // If business user and just logged in, redirect to dashboard
-      if (justLoggedIn) {
-        navigate("/dashboard");
         setJustLoggedIn(false);
-        setIsLoading(false);
-      }
-      // If already logged in as business user, redirect to dashboard
-      else if (!justLoggedIn) {
-        navigate("/dashboard");
       }
     }
   }, [profile, loading, justLoggedIn, user, navigate, toast]);
