@@ -355,70 +355,108 @@ export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmitOrder} className="space-y-4">
-                {/* Name */}
-                <div>
-                  <Label htmlFor="name">Full Name *</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={guestInfo.name}
-                    onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
-                    required
-                  />
-                </div>
-
-                {/* Phone */}
-                <div>
-                  <Label htmlFor="phone">Phone Number *</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="(555) 123-4567"
-                    value={guestInfo.phone}
-                    onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    We'll text you when your order is ready
-                  </p>
-                </div>
-
-                {/* Email (Required for verification) */}
-                <div>
-                  <Label htmlFor="email">Email * (Required for verification)</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john@example.com"
-                      value={guestInfo.email}
-                      onChange={(e) => {
-                        setGuestInfo({ ...guestInfo, email: e.target.value });
-                        // Reset verification if email changes
-                        if (verificationStep !== 'info') {
-                          setVerificationStep('info');
-                          setVerificationCode("");
-                          setFallbackCode(null);
-                        }
-                      }}
-                      disabled={verificationStep === 'verified'}
-                      required
-                    />
-                    {verificationStep === 'verified' && (
-                      <Badge className="bg-green-500 flex items-center gap-1">
-                        <ShieldCheck className="h-3 w-3" />
-                        Verified
+                {/* Logged-in Customer Info Display */}
+                {user && isCustomer && profile ? (
+                  <div className="bg-green-50 dark:bg-green-950 rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-green-700 dark:text-green-300">Your Information</span>
+                      <Badge className="bg-green-500">
+                        <ShieldCheck className="h-3 w-3 mr-1" />
+                        Verified Account
                       </Badge>
-                    )}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="bg-white dark:bg-gray-800 rounded-md p-3">
+                        <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                          <User className="h-3 w-3" />
+                          Name
+                        </div>
+                        <p className="font-medium">{guestInfo.name || 'Not set'}</p>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 rounded-md p-3">
+                        <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                          <Phone className="h-3 w-3" />
+                          Phone
+                        </div>
+                        <p className="font-medium">{guestInfo.phone || 'Not set'}</p>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 rounded-md p-3">
+                        <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                          <Mail className="h-3 w-3" />
+                          Email
+                        </div>
+                        <p className="font-medium text-sm truncate">{guestInfo.email || 'Not set'}</p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    We'll send a verification code to confirm your email
-                  </p>
-                </div>
+                ) : (
+                  <>
+                    {/* Name */}
+                    <div>
+                      <Label htmlFor="name">Full Name *</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        placeholder="John Doe"
+                        value={guestInfo.name}
+                        onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
+                        required
+                      />
+                    </div>
 
-                {/* Verification Section */}
-                {verificationStep === 'info' && guestInfo.email && guestInfo.name && guestInfo.phone && (
+                    {/* Phone */}
+                    <div>
+                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="(555) 123-4567"
+                        value={guestInfo.phone}
+                        onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        We'll text you when your order is ready
+                      </p>
+                    </div>
+
+                    {/* Email (Required for verification) */}
+                    <div>
+                      <Label htmlFor="email">Email * (Required for verification)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="john@example.com"
+                          value={guestInfo.email}
+                          onChange={(e) => {
+                            setGuestInfo({ ...guestInfo, email: e.target.value });
+                            // Reset verification if email changes
+                            if (verificationStep !== 'info') {
+                              setVerificationStep('info');
+                              setVerificationCode("");
+                              setFallbackCode(null);
+                            }
+                          }}
+                          disabled={verificationStep === 'verified'}
+                          required
+                        />
+                        {verificationStep === 'verified' && (
+                          <Badge className="bg-green-500 flex items-center gap-1">
+                            <ShieldCheck className="h-3 w-3" />
+                            Verified
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        We'll send a verification code to confirm your email
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Verification Section - Only for guests */}
+                {!user && verificationStep === 'info' && guestInfo.email && guestInfo.name && guestInfo.phone && (
                   <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
                     <p className="text-sm font-medium mb-2">Verify your email to continue</p>
                     <Button
@@ -447,7 +485,7 @@ export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
                   </div>
                 )}
 
-                {verificationStep === 'verify' && (
+                {!user && verificationStep === 'verify' && (
                   <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-lg space-y-3">
                     {fallbackCode ? (
                       <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg text-center mb-2">
@@ -516,7 +554,7 @@ export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
                   </div>
                 )}
 
-                {verificationStep === 'verified' && (
+                {!user && verificationStep === 'verified' && (
                   <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg flex items-center gap-2">
                     <ShieldCheck className="h-5 w-5 text-green-600" />
                     <p className="text-sm font-medium text-green-700 dark:text-green-300">
