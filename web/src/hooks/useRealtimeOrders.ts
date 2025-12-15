@@ -104,6 +104,11 @@ export function useRealtimeOrders(options: UseRealtimeOrdersOptions = {}) {
 
     fetchOrders()
 
+    // Auto-refresh fallback every 30 seconds (in case realtime fails)
+    const refreshInterval = setInterval(() => {
+      fetchOrders()
+    }, 30000)
+
     // Subscribe to real-time changes
     const channelName = `orders-${profile?.store_id || storeId || 'all'}`
     channel = supabase.channel(channelName)
@@ -189,6 +194,7 @@ export function useRealtimeOrders(options: UseRealtimeOrdersOptions = {}) {
       if (channel) {
         supabase.removeChannel(channel)
       }
+      clearInterval(refreshInterval)
     }
   }, [profile, storeId, status, limit, includeAll])
 

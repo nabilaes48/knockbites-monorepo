@@ -134,8 +134,14 @@ const OrderTracking = () => {
       )
       .subscribe();
 
+    // Auto-refresh fallback every 15 seconds (in case realtime fails)
+    const refreshInterval = setInterval(() => {
+      fetchOrder();
+    }, 15000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(refreshInterval);
     };
   }, [orderId]);
 

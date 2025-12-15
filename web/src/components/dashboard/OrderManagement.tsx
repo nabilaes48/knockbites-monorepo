@@ -25,11 +25,14 @@ import {
   Crown,
   RefreshCw,
   XCircle,
+  Printer,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtimeOrders } from "@/hooks/useRealtimeOrders";
 import type { Order as SupabaseOrder } from "@/hooks/useRealtimeOrders";
 import { cn } from "@/lib/utils";
+import { autoPrintOrder, playNewOrderSound, printOrder, type PrintableOrder } from "@/utils/orderPrint";
+import { locations } from "@/data/locations";
 
 // Local order interface for component use
 interface OrderItem {
@@ -81,11 +84,44 @@ export const OrderManagement = () => {
     isRepeatCustomer: order.is_repeat_customer,
   }));
 
+  // Convert order to printable format
+  const toPrintableOrder = (order: Order, storeId?: number): PrintableOrder => {
+    const store = storeId ? locations.find(l => l.id === storeId) : undefined;
+    return {
+      id: order.id,
+      orderNumber: order.orderId.split("-")[1] || order.orderId,
+      customerName: order.name,
+      customerPhone: order.phone,
+      customerEmail: order.email,
+      items: order.items.map(item => ({
+        name: item.item_name || item.name,
+        quantity: item.quantity,
+        price: item.item_price || item.price,
+        customizations: item.customizations,
+        notes: item.notes,
+      })),
+      subtotal: order.total * 0.92, // Approximate subtotal
+      tax: order.total * 0.08, // Approximate tax
+      total: order.total,
+      specialInstructions: order.specialInstructions,
+      createdAt: order.createdAt,
+      storeName: store?.name,
+    };
+  };
+
+  // Manual print handler
+  const handlePrintOrder = (order: Order, storeId?: number) => {
+    const printableOrder = toPrintableOrder(order, storeId);
+    printOrder(printableOrder);
+  };
+
   // Notify on new orders
   useEffect(() => {
     const currentCount = orders.length;
     if (currentCount > lastOrderCountRef.current && lastOrderCountRef.current > 0) {
-      playNotificationSound();
+      // Play loud notification sound
+      playNewOrderSound();
+
       const latestOrder = orders[0];
 
       setNewOrderIds(prev => new Set(prev).add(latestOrder.id));
@@ -95,10 +131,17 @@ export const OrderManagement = () => {
       }
 
       toast({
-        title: "New Order Received!",
-        description: `Order #${latestOrder.orderId.split("-")[1]} from ${latestOrder.name}`,
-        duration: 8000,
+        title: "🔔 New Order Received!",
+        description: `Order #${latestOrder.orderId.split("-")[1]} from ${latestOrder.name} - $${latestOrder.total.toFixed(2)}`,
+        duration: 10000,
       });
+
+      // Auto-print the new order
+      const supabaseOrder = supabaseOrders.find(o => o.id === latestOrder.id);
+      if (supabaseOrder) {
+        const printableOrder = toPrintableOrder(latestOrder, supabaseOrder.store_id);
+        autoPrintOrder(printableOrder);
+      }
 
       setTimeout(() => {
         setNewOrderIds(prev => {
@@ -131,7 +174,7 @@ export const OrderManagement = () => {
       });
 
       if (newStatus === "ready") {
-        playNotificationSound();
+        playNewOrderSound();
       }
     } else {
       toast({
@@ -148,38 +191,6 @@ export const OrderManagement = () => {
     }
   };
 
-  const playNotificationSound = () => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.5);
-
-      setTimeout(() => {
-        const oscillator2 = audioContext.createOscillator();
-        const gainNode2 = audioContext.createGain();
-        oscillator2.connect(gainNode2);
-        gainNode2.connect(audioContext.destination);
-        oscillator2.frequency.value = 1000;
-        oscillator2.type = 'sine';
-        gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        oscillator2.start(audioContext.currentTime);
-        oscillator2.stop(audioContext.currentTime + 0.5);
-      }, 200);
-    } catch (error) {
-      console.log('Audio notification not supported:', error);
-    }
-  };
 
   // Calculate statistics
   const stats = {
@@ -617,10 +628,22 @@ export const OrderManagement = () => {
 
                 {/* Fixed Footer - Total & Buttons */}
                 <div className="px-4 pb-4 pt-3 mt-auto border-t border-border/50 bg-muted/30">
-                  {/* Total */}
-                  <div className="flex justify-between font-semibold mb-3">
+                  {/* Total & Print */}
+                  <div className="flex justify-between items-center font-semibold mb-3">
                     <span>Total</span>
-                    <span className="text-lg text-primary">${order.total.toFixed(2)}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg text-primary">${order.total.toFixed(2)}</span>
+                      <button
+                        onClick={() => {
+                          const supabaseOrder = supabaseOrders.find(o => o.id === order.id);
+                          handlePrintOrder(order, supabaseOrder?.store_id);
+                        }}
+                        className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+                        title="Print Order"
+                      >
+                        <Printer className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Action Buttons */}
