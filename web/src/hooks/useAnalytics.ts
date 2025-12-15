@@ -89,7 +89,7 @@ export interface BusinessInsights {
   avg_wait_time: number;
 }
 
-export function useAnalytics(storeId: number, dateRange: string = 'today') {
+export function useAnalytics(storeId: number | null, dateRange: string = 'today') {
   const [metrics, setMetrics] = useState<StoreMetrics | null>(null);
   const [revenueData, setRevenueData] = useState<RevenueChartData[]>([]);
   const [timeDistribution, setTimeDistribution] = useState<TimeDistribution[]>([]);
@@ -105,10 +105,20 @@ export function useAnalytics(storeId: number, dateRange: string = 'today') {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAnalytics();
+    if (storeId !== null) {
+      fetchAnalytics();
+    } else {
+      setLoading(false);
+    }
   }, [storeId, dateRange]);
 
   const fetchAnalytics = async () => {
+    // Skip if no store selected
+    if (storeId === null) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
