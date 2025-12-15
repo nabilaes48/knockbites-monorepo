@@ -588,15 +588,34 @@ export const OrderManagement = () => {
                   <Separator className="my-3 dark:bg-primary/10" />
 
                   {/* Order Items */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {order.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          {item.quantity}x {item.item_name}
-                        </span>
-                        <span className="font-medium">
-                          ${item.subtotal ? item.subtotal.toFixed(2) : (item.item_price * item.quantity).toFixed(2)}
-                        </span>
+                      <div key={idx} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            {item.quantity}x {item.item_name}
+                          </span>
+                          <span className="font-medium">
+                            ${item.subtotal ? item.subtotal.toFixed(2) : (item.item_price * item.quantity).toFixed(2)}
+                          </span>
+                        </div>
+                        {/* Show customizations */}
+                        {item.customizations && item.customizations.length > 0 && (
+                          <div className="ml-4 text-xs text-muted-foreground space-y-0.5">
+                            {item.customizations.map((custom: string, cIdx: number) => (
+                              <div key={cIdx} className="flex items-center gap-1">
+                                <span className="text-primary">•</span>
+                                <span>{custom}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {/* Show item notes */}
+                        {item.notes && (
+                          <div className="ml-4 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                            Note: {item.notes}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

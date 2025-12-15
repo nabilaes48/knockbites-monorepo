@@ -12,6 +12,7 @@ import { RewardsHistory } from "@/components/rewards/RewardsHistory";
 import { useRewards, convertTransactionsForDisplay } from "@/hooks/useRewards";
 import { POINTS_TO_DOLLAR, calculateTier } from "@/types/rewards";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 import {
   ShoppingBag,
   Heart,
@@ -21,14 +22,27 @@ import {
   MapPin,
   Star,
   LogOut,
+  Loader2,
 } from "lucide-react";
 
+interface OrderItem {
+  id: number;
+  item_name: string;
+  item_price: number;
+  quantity: number;
+  subtotal: number;
+  customizations?: string[];
+  notes?: string;
+}
+
 interface Order {
-  orderId: string;
-  createdAt: string;
+  id: string;
+  order_number: string;
+  created_at: string;
   total: number;
   status: string;
-  items: any[];
+  store_id: number;
+  order_items: OrderItem[];
 }
 
 const CustomerDashboard = () => {
@@ -45,6 +59,7 @@ const CustomerDashboard = () => {
   const userName = profile?.full_name || "Customer";
 
   const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("orders");
 
   // Convert DB rewards to display format
@@ -63,28 +78,63 @@ const CustomerDashboard = () => {
   };
 
   useEffect(() => {
-    loadOrders();
-  }, []);
-
-  const loadOrders = () => {
-    const allOrders: Order[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith("order_")) {
-        const orderData = localStorage.getItem(key);
-        if (orderData) {
-          allOrders.push(JSON.parse(orderData));
-        }
-      }
+    if (user?.id) {
+      loadOrders();
     }
-    allOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    setOrders(allOrders);
+  }, [user?.id]);
+
+  const loadOrders = async () => {
+    if (!user?.id) return;
+
+    setOrdersLoading(true);
+    try {
+      // Fetch orders from Supabase where customer_id or user_id matches the logged-in user
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          order_number,
+          created_at,
+          total,
+          status,
+          store_id,
+          order_items (
+            id,
+            item_name,
+            item_price,
+            quantity,
+            subtotal,
+            customizations,
+            notes
+          )
+        `)
+        .or(`customer_id.eq.${user.id},user_id.eq.${user.id}`)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.error('Error fetching orders:', error);
+      } else {
+        setOrders(data || []);
+      }
+    } catch (err) {
+      console.error('Error loading orders:', err);
+    } finally {
+      setOrdersLoading(false);
+    }
   };
 
   const handleReorder = (order: Order) => {
     // Store the order items in localStorage as cart items
     try {
-      localStorage.setItem("cartItems", JSON.stringify(order.items));
+      const cartItems = order.order_items.map(item => ({
+        id: item.id,
+        name: item.item_name,
+        price: item.item_price,
+        quantity: item.quantity,
+        customizations: item.customizations || [],
+      }));
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
       // Navigate to order page
       navigate("/order");
     } catch (error) {
@@ -209,7 +259,12 @@ const CustomerDashboard = () => {
                   <CardTitle>Order History</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {orders.length === 0 ? (
+                  {ordersLoading ? (
+                    <div className="text-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-[#FF8C42] mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">Loading your orders...</p>
+                    </div>
+                  ) : orders.length === 0 ? (
                     <div className="text-center py-12">
                       <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                       <p className="text-lg font-semibold mb-1">No orders yet</p>
@@ -224,17 +279,17 @@ const CustomerDashboard = () => {
                     <div className="space-y-4">
                       {orders.map((order) => (
                         <div
-                          key={order.orderId}
+                          key={order.id}
                           className="border rounded-lg p-4 hover:shadow-md transition-all"
                         >
                           <div className="flex items-start justify-between mb-3">
                             <div>
                               <p className="font-semibold">
-                                Order #{order.orderId.split("-")[1]}
+                                Order #{order.order_number || order.id.split("-")[0]}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {new Date(order.createdAt).toLocaleDateString()} at{" "}
-                                {new Date(order.createdAt).toLocaleTimeString()}
+                                {new Date(order.created_at).toLocaleDateString()} at{" "}
+                                {new Date(order.created_at).toLocaleTimeString()}
                               </p>
                             </div>
                             <Badge
@@ -250,6 +305,10 @@ const CustomerDashboard = () => {
                                   ? "bg-gray-500"
                                   : order.status === "ready"
                                   ? "bg-accent"
+                                  : order.status === "preparing"
+                                  ? "bg-blue-500"
+                                  : order.status === "pending"
+                                  ? "bg-orange-500"
                                   : ""
                               }
                             >
@@ -259,15 +318,34 @@ const CustomerDashboard = () => {
 
                           <Separator className="my-3" />
 
-                          <div className="space-y-2">
-                            {order.items.map((item: any, idx: number) => (
-                              <div key={idx} className="flex justify-between text-sm">
-                                <span>
-                                  {item.quantity}x {item.name}
-                                </span>
-                                <span className="font-semibold">
-                                  ${(item.price * item.quantity).toFixed(2)}
-                                </span>
+                          <div className="space-y-3">
+                            {order.order_items?.map((item, idx) => (
+                              <div key={idx} className="space-y-1">
+                                <div className="flex justify-between text-sm">
+                                  <span>
+                                    {item.quantity}x {item.item_name}
+                                  </span>
+                                  <span className="font-semibold">
+                                    ${item.subtotal?.toFixed(2) || (item.item_price * item.quantity).toFixed(2)}
+                                  </span>
+                                </div>
+                                {/* Show customizations */}
+                                {item.customizations && item.customizations.length > 0 && (
+                                  <div className="ml-4 text-xs text-muted-foreground space-y-0.5">
+                                    {item.customizations.map((custom: string, cIdx: number) => (
+                                      <div key={cIdx} className="flex items-center gap-1">
+                                        <span className="text-[#FF8C42]">•</span>
+                                        <span>{custom}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {/* Show item notes */}
+                                {item.notes && (
+                                  <div className="ml-4 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                                    Note: {item.notes}
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -277,7 +355,7 @@ const CustomerDashboard = () => {
                           <div className="flex items-center justify-between">
                             <span className="font-bold">Total: ${order.total.toFixed(2)}</span>
                             <div className="flex gap-2">
-                              <Link to={`/order/tracking/${order.orderId}`}>
+                              <Link to={`/order/tracking/${order.id}`}>
                                 <Button
                                   variant="outline"
                                   size="sm"
