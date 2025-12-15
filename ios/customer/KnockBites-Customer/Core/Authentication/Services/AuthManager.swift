@@ -88,8 +88,8 @@ class AuthManager: ObservableObject {
             return false
         }
 
-        guard password.count >= 6 else {
-            errorMessage = "Password must be at least 6 characters"
+        guard password.count >= 8 else {
+            errorMessage = "Password must be at least 8 characters"
             return false
         }
 
@@ -162,8 +162,40 @@ class AuthManager: ObservableObject {
         }
     }
 
-    // MARK: - Password Reset
+    // MARK: - Password Reset (OTP Flow)
 
+    /// Send password reset OTP code to email
+    func sendPasswordResetOTP(email: String) async throws {
+        guard !email.isEmpty else {
+            throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Please enter your email address"])
+        }
+
+        guard isValidEmail(email) else {
+            throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Please enter a valid email address"])
+        }
+
+        // Send OTP code for password recovery (no redirect URL = OTP mode)
+        try await supabase.auth.resetPasswordForEmail(email)
+        print("✅ Password reset OTP sent to: \(email)")
+    }
+
+    /// Verify the OTP code for password reset
+    func verifyPasswordResetOTP(email: String, token: String) async throws {
+        do {
+            try await supabase.auth.verifyOTP(
+                email: email,
+                token: token,
+                type: .recovery
+            )
+            print("✅ OTP verified successfully")
+            isAuthenticated = true
+        } catch {
+            print("❌ OTP verification error: \(error)")
+            throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid or expired code"])
+        }
+    }
+
+    /// Legacy method for Universal Link flow (kept for backward compatibility)
     func sendPasswordReset(email: String) async throws {
         guard !email.isEmpty else {
             throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Please enter your email address"])
@@ -184,8 +216,8 @@ class AuthManager: ObservableObject {
     // MARK: - Update Password
 
     func updatePassword(newPassword: String) async throws {
-        guard newPassword.count >= 6 else {
-            throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Password must be at least 6 characters"])
+        guard newPassword.count >= 8 else {
+            throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Password must be at least 8 characters"])
         }
 
         do {

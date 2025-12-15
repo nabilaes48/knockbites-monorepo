@@ -140,9 +140,9 @@ struct ResetPasswordView: View {
                                         .font(AppFonts.caption)
                                         .foregroundColor(.textSecondary)
 
-                                    PasswordRequirement(
-                                        text: "Be at least 6 characters",
-                                        isMet: newPassword.count >= 6
+                                    PasswordRequirementIndicator(
+                                        text: "Be at least 8 characters",
+                                        isMet: newPassword.count >= 8
                                     )
                                 }
                                 .padding(.top, Spacing.sm)
@@ -199,7 +199,7 @@ struct ResetPasswordView: View {
     }
 
     var isFormValid: Bool {
-        newPassword.count >= 6 && newPassword == confirmPassword
+        newPassword.count >= 8 && newPassword == confirmPassword
     }
 
     func handlePasswordUpdate() async {
@@ -224,8 +224,8 @@ struct ResetPasswordView: View {
     }
 }
 
-// MARK: - Password Requirement Row
-struct PasswordRequirement: View {
+// MARK: - Password Requirement Indicator
+struct PasswordRequirementIndicator: View {
     let text: String
     let isMet: Bool
 

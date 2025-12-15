@@ -55,7 +55,7 @@ struct SignUpView: View {
                             // Password
                             PasswordInputField(
                                 label: "Password",
-                                placeholder: "At least 6 characters",
+                                placeholder: "At least 8 characters",
                                 text: $password,
                                 showPassword: $showPassword
                             )
@@ -152,7 +152,7 @@ struct SignUpView: View {
         !password.isEmpty &&
         passwordsMatch &&
         agreedToTerms &&
-        password.count >= 6
+        password.count >= 8
     }
 
     func handleSignUp() async {
