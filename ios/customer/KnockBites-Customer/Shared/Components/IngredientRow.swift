@@ -12,47 +12,56 @@ struct IngredientRow: View {
     @Binding var selectedPortion: PortionLevel
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Ingredient Name
-            VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 8) {
+            // Ingredient Name on its own line
+            HStack {
                 Text(customization.name)
                     .font(AppFonts.body)
+                    .fontWeight(.medium)
                     .foregroundColor(.textPrimary)
 
+                Spacer()
+
+                // Price indicator if applicable
                 if let pricing = customization.portionPricing,
                    pricing[selectedPortion] > 0 {
                     Text("+$\(pricing[selectedPortion], specifier: "%.2f")")
                         .font(AppFonts.caption)
-                        .foregroundColor(.textSecondary)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.brandPrimary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.brandPrimary.opacity(0.1))
+                        .cornerRadius(6)
                 }
             }
 
-            Spacer()
-
-            // Compact Portion Selector
-            HStack(spacing: 4) {
+            // Portion Selector on next line
+            HStack(spacing: 6) {
                 ForEach(PortionLevel.allCases, id: \.self) { portion in
                     Button(action: { selectedPortion = portion }) {
                         VStack(spacing: 2) {
                             Text(portion.emoji)
-                                .font(.system(size: 16))
+                                .font(.system(size: 18))
 
                             Text(portionShortName(portion))
-                                .font(.system(size: 9, weight: .medium))
+                                .font(.system(size: 10, weight: .semibold))
                                 .foregroundColor(selectedPortion == portion ? .white : .textPrimary)
                         }
-                        .frame(width: 50, height: 44)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
                         .background(selectedPortion == portion ? Color.brandPrimary : Color.surface)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: 10)
                                 .stroke(selectedPortion == portion ? Color.clear : Color.border, lineWidth: 1)
                         )
-                        .cornerRadius(8)
+                        .cornerRadius(10)
                     }
                 }
             }
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 4)
     }
 
     private func portionShortName(_ portion: PortionLevel) -> String {
