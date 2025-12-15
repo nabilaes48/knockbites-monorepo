@@ -405,30 +405,48 @@ struct ModernKitchenOrderCard: View {
             // Items Section
             VStack(alignment: .leading, spacing: Spacing.md) {
                 ForEach(order.items.prefix(3), id: \.name) { item in
-                    HStack(alignment: .top, spacing: Spacing.md) {
-                        // Quantity Badge
-                        Text("\(item.quantity)")
-                            .font(AppFonts.body)
-                            .fontWeight(.black)
-                            .foregroundColor(.white)
-                            .frame(width: 32, height: 32)
-                            .background(
-                                Circle()
-                                    .fill(Color.brandPrimary)
-                            )
+                    VStack(alignment: .leading, spacing: Spacing.xs) {
+                        HStack(alignment: .top, spacing: Spacing.md) {
+                            // Quantity Badge
+                            Text("\(item.quantity)")
+                                .font(AppFonts.body)
+                                .fontWeight(.black)
+                                .foregroundColor(.white)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    Circle()
+                                        .fill(Color.brandPrimary)
+                                )
 
-                        // Item Name
-                        Text(item.name)
-                            .font(AppFonts.body)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.textPrimary)
+                            // Item Name
+                            Text(item.name)
+                                .font(AppFonts.body)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.textPrimary)
 
-                        Spacer()
+                            Spacer()
 
-                        // Checkmark placeholder
-                        Circle()
-                            .strokeBorder(Color.gray.opacity(0.3), lineWidth: 2)
-                            .frame(width: 24, height: 24)
+                            // Checkmark placeholder
+                            Circle()
+                                .strokeBorder(Color.gray.opacity(0.3), lineWidth: 2)
+                                .frame(width: 24, height: 24)
+                        }
+
+                        // Customizations on separate lines
+                        if !item.customizations.isEmpty {
+                            VStack(alignment: .leading, spacing: 2) {
+                                ForEach(item.customizations, id: \.self) { customization in
+                                    HStack(spacing: 4) {
+                                        Text("•")
+                                            .foregroundColor(.brandPrimary)
+                                        Text(customization)
+                                            .font(AppFonts.caption)
+                                            .foregroundColor(.textSecondary)
+                                    }
+                                }
+                            }
+                            .padding(.leading, 44) // Align with item name
+                        }
                     }
                 }
 

@@ -254,42 +254,58 @@ struct OrderItemDetailRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            HStack {
+            HStack(alignment: .top) {
                 Text("\(item.quantity)x")
                     .font(AppFonts.headline)
                     .foregroundColor(.brandPrimary)
-                    .frame(width: 40)
+                    .frame(width: 40, alignment: .leading)
 
-                VStack(alignment: .leading, spacing: Spacing.xs) {
-                    Text(item.menuItem.name)
-                        .font(AppFonts.headline)
-                        .foregroundColor(.textPrimary)
+                VStack(alignment: .leading, spacing: Spacing.sm) {
+                    // Item name and price on same row
+                    HStack {
+                        Text(item.menuItem.name)
+                            .font(AppFonts.headline)
+                            .foregroundColor(.textPrimary)
 
+                        Spacer()
+
+                        Text(String(format: "$%.2f", item.totalPrice))
+                            .font(AppFonts.body)
+                            .foregroundColor(.textPrimary)
+                    }
+
+                    // Customizations on separate lines
+                    if !item.customizationSummary.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            ForEach(item.customizationSummary.components(separatedBy: ", "), id: \.self) { customization in
+                                HStack(spacing: 6) {
+                                    Circle()
+                                        .fill(Color.brandPrimary)
+                                        .frame(width: 6, height: 6)
+                                    Text(customization)
+                                        .font(AppFonts.subheadline)
+                                        .foregroundColor(.textSecondary)
+                                }
+                            }
+                        }
+                        .padding(.leading, 4)
+                    }
+
+                    // Special instructions highlighted
                     if !item.specialInstructions.isEmpty {
                         HStack(spacing: Spacing.xs) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.caption)
                             Text(item.specialInstructions)
-                                .font(AppFonts.body)
+                                .font(AppFonts.subheadline)
                         }
                         .foregroundColor(.warning)
                         .padding(Spacing.sm)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.warning.opacity(0.1))
                         .cornerRadius(CornerRadius.sm)
                     }
-
-                    if !item.customizationSummary.isEmpty {
-                        Text(item.customizationSummary)
-                            .font(AppFonts.caption)
-                            .foregroundColor(.textSecondary)
-                    }
                 }
-
-                Spacer()
-
-                Text(String(format: "$%.2f", item.totalPrice))
-                    .font(AppFonts.body)
-                    .foregroundColor(.textPrimary)
             }
 
             Divider()
