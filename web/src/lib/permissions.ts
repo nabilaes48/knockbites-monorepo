@@ -147,7 +147,7 @@ function hasRolePermission(role: Role, permission: Permission): boolean {
 export async function getUserPermissions(userId: string): Promise<ExtendedUserProfile | null> {
   try {
     const { data, error } = await supabase
-      .from('staff_profiles')
+      .from('user_profiles')
       .select('*')
       .eq('id', userId)
       .single()

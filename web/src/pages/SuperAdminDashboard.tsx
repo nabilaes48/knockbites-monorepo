@@ -76,7 +76,7 @@ const SuperAdminDashboard = () => {
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-2 rounded-lg shadow-lg shadow-purple-500/50 animate-pulse">
+                <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-2 rounded-lg shadow-lg shadow-purple-500/50">
                   <Crown className="h-7 w-7 text-white" />
                 </div>
                 <div>
@@ -84,7 +84,7 @@ const SuperAdminDashboard = () => {
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
                       Super Admin Dashboard
                     </h1>
-                    <Badge className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-lg shadow-purple-500/50 animate-pulse">
+                    <Badge className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-lg shadow-purple-500/50">
                       <Crown className="h-3 w-3 mr-1" />
                       Super Admin
                     </Badge>

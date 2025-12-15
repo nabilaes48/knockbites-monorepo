@@ -202,14 +202,19 @@ const OrderTracking = () => {
 
       <main className="pt-20 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          {/* Success Header */}
+          {/* Success Header - Personalized with customer's first name */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/20 mb-4">
               <CheckCircle2 className="h-8 w-8 text-accent" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">Order Confirmed!</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              Thank you, {orderData.customer_name.split(' ')[0]}!
+            </h1>
             <p className="text-lg text-muted-foreground">
-              Order #{orderData.order_number || orderData.id.split('-')[0].toUpperCase()}
+              Order #{orderData.order_number || orderData.id.split('-')[0].toUpperCase()} is confirmed
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              We're preparing your order with care
             </p>
           </div>
 

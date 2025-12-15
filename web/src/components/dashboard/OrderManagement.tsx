@@ -404,7 +404,7 @@ export const OrderManagement = () => {
               {newOrderIds.size > 0 && (
                 <span className={cn(
                   "absolute -top-1 -right-1 h-5 w-5 text-xs font-bold rounded-full",
-                  "flex items-center justify-center animate-pulse",
+                  "flex items-center justify-center",
                   "bg-accent text-accent-foreground",
                   "dark:bg-neon-green dark:shadow-glow-accent"
                 )}>

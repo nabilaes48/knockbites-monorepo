@@ -123,7 +123,7 @@ const NeonButton = forwardRef<HTMLButtonElement, NeonButtonProps>(
         )}
 
         {/* Content */}
-        <span className={cn(loading && "invisible")}>{children}</span>
+        <span className={cn("inline-flex items-center", loading && "invisible")}>{children}</span>
       </button>
     );
   }

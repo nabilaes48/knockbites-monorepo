@@ -138,8 +138,7 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
               glowColor === "cyan" && "from-neon-cyan/20 via-neon-blue/20 to-neon-cyan/20",
               glowColor === "orange" && "from-neon-orange/20 via-amber-500/20 to-neon-orange/20",
               glowColor === "pink" && "from-neon-pink/20 via-neon-purple/20 to-neon-pink/20",
-              "animate-pulse-glow"
-            )}
+              )}
             style={{ filter: "blur(20px)", transform: "scale(0.95)" }}
           />
         )}

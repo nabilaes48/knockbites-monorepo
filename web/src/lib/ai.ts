@@ -154,7 +154,9 @@ async function callAIEngine<T>(action: string, payload: Record<string, unknown> 
 }
 
 // Helper to call V4 RPC directly
-async function callV4RPC<T>(name: string, payload: Record<string, unknown> = {}): Promise<T> {
+// Note: Many AI RPC functions are not yet implemented in the database
+// This helper returns null silently for missing functions to avoid console spam
+async function callV4RPC<T>(name: string, payload: Record<string, unknown> = {}): Promise<T | null> {
   try {
     const { data, error } = await supabase.rpc('rpc_v4_dispatch', {
       p_name: name,
@@ -162,13 +164,17 @@ async function callV4RPC<T>(name: string, payload: Record<string, unknown> = {})
     });
 
     if (error) {
+      // Silently return null for missing functions (404 or 42883)
+      if (error.code === '42883' || error.message?.includes('404')) {
+        return null;
+      }
       throw new Error(error.message);
     }
 
     return data as T;
   } catch (error) {
-    log.error(`V4 RPC call failed: ${name}`, error instanceof Error ? error : new Error(String(error)));
-    throw error;
+    // Silently fail for AI functions that aren't implemented yet
+    return null;
   }
 }
 

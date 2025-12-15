@@ -136,7 +136,7 @@ export async function query<T>(
  * Instrumented RPC wrapper
  *
  * @example
- * const metrics = await rpc('getStoreMetrics', 'get_store_metrics_secure', {
+ * const metrics = await rpc('getStoreMetrics', 'get_store_metrics', {
  *   p_store_id: 1,
  *   p_date_range: 'today'
  * });

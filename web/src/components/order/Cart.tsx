@@ -20,9 +20,10 @@ interface CartProps {
   items: CartItem[];
   onUpdateItems: (items: CartItem[]) => void;
   onCheckout: () => void;
+  compact?: boolean;
 }
 
-export const Cart = ({ items, onUpdateItems, onCheckout }: CartProps) => {
+export const Cart = ({ items, onUpdateItems, onCheckout, compact = false }: CartProps) => {
   const updateQuantity = (cartId: number, newQuantity: number) => {
     if (newQuantity === 0) {
       removeItem(cartId);
@@ -152,9 +153,8 @@ export const Cart = ({ items, onUpdateItems, onCheckout }: CartProps) => {
 
             {/* Checkout Button */}
             <Button
-              variant="secondary"
               size="lg"
-              className="w-full"
+              className="w-full bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] hover:from-[#D97706] hover:to-[#B45309] text-white font-semibold shadow-md hover:shadow-lg transition-all"
               disabled={!canCheckout}
               onClick={onCheckout}
             >

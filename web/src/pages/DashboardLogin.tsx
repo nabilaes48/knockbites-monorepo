@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Store, ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Users } from "lucide-react";
 
 const DashboardLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const { signIn, profile, loading, user } = useAuth();
   const [credentials, setCredentials] = useState({
     email: "",
@@ -19,10 +20,24 @@ const DashboardLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [justLoggedIn, setJustLoggedIn] = useState(false);
 
+  // Check if this is from an invite
+  const isInvite = searchParams.get("invited") === "true";
+
+  // Handle invite flow - if user is authenticated via magic link and invited=true, redirect to set password
+  useEffect(() => {
+    if (isInvite && user && !loading) {
+      // User came from invite email - redirect to set password page
+      navigate("/set-password?invited=true");
+    }
+  }, [isInvite, user, loading, navigate]);
+
   // Auto-redirect or block based on profile
   useEffect(() => {
     // Wait for auth to finish loading
     if (loading) return;
+
+    // Don't redirect if this is an invite flow (handled above)
+    if (isInvite) return;
 
     // If user is logged in
     if (user) {
@@ -51,7 +66,7 @@ const DashboardLogin = () => {
         setJustLoggedIn(false);
       }
     }
-  }, [profile, loading, justLoggedIn, user, navigate, toast]);
+  }, [profile, loading, justLoggedIn, user, navigate, toast, isInvite]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,9 +102,11 @@ const DashboardLogin = () => {
 
         <Card>
           <CardHeader className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4">
-              <Store className="h-8 w-8 text-primary" />
-            </div>
+            <img
+              src="/knockbites-logo.png"
+              alt="KnockBites"
+              className="w-16 h-16 rounded-xl mx-auto mb-4 shadow-lg"
+            />
             <CardTitle className="text-2xl">Business Dashboard</CardTitle>
             <CardDescription>
               Sign in to manage orders and menu
@@ -110,7 +127,15 @@ const DashboardLogin = () => {
               </div>
 
               <div>
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <Input
                   id="password"
                   type="password"

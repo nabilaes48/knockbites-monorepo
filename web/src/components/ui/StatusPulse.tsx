@@ -69,7 +69,7 @@ const sizeStyles = {
 export function StatusPulse({
   variant = "online",
   size = "md",
-  animate = true,
+  animate = false,
   className,
 }: StatusPulseProps) {
   const colors = variantColors[variant];
@@ -113,7 +113,7 @@ export function StatusIndicator({
   variant = "online",
   label,
   size = "md",
-  animate = true,
+  animate = false,
   className,
 }: StatusPulseProps & { label?: string }) {
   return (

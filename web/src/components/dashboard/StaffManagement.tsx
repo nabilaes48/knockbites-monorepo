@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,10 +37,15 @@ import {
   Mail,
   Phone,
   Calendar,
+  Loader2,
+  Send,
+  RefreshCw,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { locations } from "@/data/locations";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Staff {
   id: string;
@@ -51,8 +56,9 @@ interface Staff {
   storeId?: string;
   storeName?: string;
   permissions: string[];
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "invited";
   hireDate: string;
+  emailConfirmed: boolean;
   performance: {
     ordersHandled: number;
     avgResponseTime: number;
@@ -60,77 +66,200 @@ interface Staff {
   };
 }
 
-const INITIAL_STAFF: Staff[] = [
-  {
-    id: "1",
-    name: "John Smith",
-    email: "john.smith@knockbites.com",
-    phone: "(845) 928-2803",
-    role: "admin",
-    storeId: "1",
-    storeName: "Highland Mills Snack Shop Inc",
-    permissions: ["orders", "menu", "analytics", "settings", "staff"],
-    status: "active",
-    hireDate: "2021-03-15",
-    performance: { ordersHandled: 1250, avgResponseTime: 12, rating: 4.8 },
-  },
-  {
-    id: "2",
-    name: "Sarah Manager",
-    email: "sarah.manager@knockbites.com",
-    phone: "(845) 555-0123",
-    role: "manager",
-    storeId: "1",
-    storeName: "Highland Mills Snack Shop Inc",
-    permissions: ["orders", "menu", "analytics", "settings"],
-    status: "active",
-    hireDate: "2021-06-20",
-    performance: { ordersHandled: 980, avgResponseTime: 15, rating: 4.6 },
-  },
-  {
-    id: "3",
-    name: "Mike Johnson",
-    email: "mike.johnson@knockbites.com",
-    phone: "(845) 555-0456",
-    role: "staff",
-    storeId: "1",
-    storeName: "Highland Mills Snack Shop Inc",
-    permissions: ["orders"],
-    status: "active",
-    hireDate: "2022-01-10",
-    performance: { ordersHandled: 2100, avgResponseTime: 10, rating: 4.9 },
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    email: "emily.davis@knockbites.com",
-    phone: "(845) 555-0789",
-    role: "staff",
-    storeId: "1",
-    storeName: "Highland Mills Snack Shop Inc",
-    permissions: ["orders", "menu"],
-    status: "active",
-    hireDate: "2022-03-05",
-    performance: { ordersHandled: 850, avgResponseTime: 14, rating: 4.7 },
-  },
-];
-
 export const StaffManagement = () => {
   const { toast } = useToast();
-  const [staff, setStaff] = useState<Staff[]>(INITIAL_STAFF);
+  const { user } = useAuth();
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterRole, setFilterRole] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isInviting, setIsInviting] = useState(false);
 
-  const [newStaff, setNewStaff] = useState<Partial<Staff>>({
+  const [newStaff, setNewStaff] = useState({
     name: "",
     email: "",
     phone: "",
-    role: "staff",
+    role: "staff" as "admin" | "manager" | "staff",
     storeId: "",
-    permissions: ["orders"],
-    status: "active",
   });
+  const [resendingId, setResendingId] = useState<string | null>(null);
+
+  // Fetch staff from database
+  useEffect(() => {
+    fetchStaff();
+  }, []);
+
+  const fetchStaff = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch user_profiles with their auth user data
+      const { data: profiles, error } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .in("role", ["super_admin", "admin", "manager", "staff"])
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Map profiles to staff list with proper invite status tracking
+      const staffList: Staff[] = (profiles || []).map((profile: any) => {
+        const store = profile.store_id
+          ? locations.find(l => l.id === profile.store_id)
+          : null;
+
+        // Determine status: invited (pending), active, or inactive
+        let status: "active" | "inactive" | "invited" = "active";
+        if (!profile.is_active) {
+          status = "inactive";
+        } else if (profile.invite_status === "pending") {
+          status = "invited";
+        }
+
+        return {
+          id: profile.id,
+          name: profile.full_name || "Unknown",
+          email: profile.email || "",
+          phone: profile.phone || "",
+          role: profile.role,
+          storeId: profile.store_id?.toString(),
+          storeName: store?.name || (profile.assigned_stores?.length > 0 ? "Multiple Stores" : undefined),
+          permissions: Array.isArray(profile.permissions) ? profile.permissions : [],
+          status,
+          hireDate: profile.created_at?.split("T")[0] || new Date().toISOString().split("T")[0],
+          emailConfirmed: profile.invite_status !== "pending",
+          performance: {
+            ordersHandled: 0,
+            avgResponseTime: 0,
+            rating: 5.0,
+          },
+        };
+      });
+
+      setStaff(staffList);
+    } catch (err) {
+      console.error("Error fetching staff:", err);
+      toast({
+        title: "Error",
+        description: "Failed to load staff members",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Invite new staff member
+  const handleInviteStaff = async () => {
+    if (!newStaff.name || !newStaff.email || !newStaff.role) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsInviting(true);
+
+    try {
+      // Get current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      // Call the invite-staff Edge Function
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-staff`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            email: newStaff.email,
+            full_name: newStaff.name,
+            phone: newStaff.phone || undefined,
+            role: newStaff.role,
+            store_id: newStaff.storeId ? parseInt(newStaff.storeId) : undefined,
+            assigned_stores: newStaff.storeId ? [parseInt(newStaff.storeId)] : [],
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to send invitation");
+      }
+
+      // Add to local state with appropriate status
+      const store = newStaff.storeId
+        ? locations.find(l => l.id.toString() === newStaff.storeId)
+        : null;
+
+      const isExistingCustomer = result.user?.isExistingCustomer || false;
+
+      const addedStaff: Staff = {
+        id: result.user?.id || Date.now().toString(),
+        name: newStaff.name,
+        email: newStaff.email,
+        phone: newStaff.phone || "",
+        role: newStaff.role,
+        storeId: newStaff.storeId,
+        storeName: store?.name,
+        permissions: getDefaultPermissions(newStaff.role),
+        status: isExistingCustomer ? "active" : "invited",
+        hireDate: new Date().toISOString().split("T")[0],
+        emailConfirmed: isExistingCustomer,
+        performance: { ordersHandled: 0, avgResponseTime: 0, rating: 5.0 },
+      };
+
+      setStaff([addedStaff, ...staff]);
+      setIsAddDialogOpen(false);
+      setNewStaff({
+        name: "",
+        email: "",
+        phone: "",
+        role: "staff",
+        storeId: "",
+      });
+
+      toast({
+        title: isExistingCustomer ? "Staff Added!" : "Invitation Sent!",
+        description: result.message || (isExistingCustomer
+          ? `${newStaff.name} can now log in with their existing password`
+          : `${newStaff.name} will receive an email to set up their account`),
+      });
+    } catch (err: any) {
+      console.error("Error inviting staff:", err);
+      toast({
+        title: "Invitation Failed",
+        description: err.message || "Failed to send invitation",
+        variant: "destructive",
+      });
+    } finally {
+      setIsInviting(false);
+    }
+  };
+
+  const getDefaultPermissions = (role: string): string[] => {
+    switch (role) {
+      case "super_admin":
+        return ["orders", "menu", "analytics", "settings", "staff", "all-stores"];
+      case "admin":
+        return ["orders", "menu", "analytics", "settings", "staff"];
+      case "manager":
+        return ["orders", "menu", "analytics", "settings"];
+      case "staff":
+        return ["orders"];
+      default:
+        return ["orders"];
+    }
+  };
 
   const roleConfig = {
     super_admin: {
@@ -175,53 +304,7 @@ export const StaffManagement = () => {
     managers: staff.filter((s) => s.role === "manager").length,
     staffCount: staff.filter((s) => s.role === "staff").length,
     active: staff.filter((s) => s.status === "active").length,
-  };
-
-  const handleAddStaff = () => {
-    if (!newStaff.name || !newStaff.email || !newStaff.role) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const rolePerms = roleConfig[newStaff.role as keyof typeof roleConfig];
-    const storeName = newStaff.storeId
-      ? locations.find((l) => l.id.toString() === newStaff.storeId)?.name
-      : undefined;
-
-    const staffMember: Staff = {
-      id: Date.now().toString(),
-      name: newStaff.name,
-      email: newStaff.email,
-      phone: newStaff.phone || "",
-      role: newStaff.role as Staff["role"],
-      storeId: newStaff.storeId,
-      storeName: storeName ? `${storeName} - Store #${newStaff.storeId}` : undefined,
-      permissions: rolePerms.defaultPermissions,
-      status: "active",
-      hireDate: new Date().toISOString().split("T")[0],
-      performance: { ordersHandled: 0, avgResponseTime: 0, rating: 5.0 },
-    };
-
-    setStaff([...staff, staffMember]);
-    setIsAddDialogOpen(false);
-    setNewStaff({
-      name: "",
-      email: "",
-      phone: "",
-      role: "staff",
-      storeId: "",
-      permissions: ["orders"],
-      status: "active",
-    });
-
-    toast({
-      title: "Staff Added Successfully",
-      description: `${staffMember.name} has been added as ${rolePerms.label}`,
-    });
+    invited: staff.filter((s) => s.status === "invited").length,
   };
 
   const handleDeleteStaff = (id: string) => {
@@ -251,6 +334,52 @@ export const StaffManagement = () => {
         return s;
       })
     );
+  };
+
+  // Resend invitation email
+  const handleResendInvite = async (member: Staff) => {
+    setResendingId(member.id);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resend-invitation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            user_id: member.id,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to resend invitation");
+      }
+
+      toast({
+        title: "Invitation Resent",
+        description: `A new invitation email has been sent to ${member.email}`,
+      });
+    } catch (err: any) {
+      console.error("Error resending invite:", err);
+      toast({
+        title: "Failed to Resend",
+        description: err.message || "Could not resend invitation",
+        variant: "destructive",
+      });
+    } finally {
+      setResendingId(null);
+    }
   };
 
   return (
@@ -307,7 +436,7 @@ export const StaffManagement = () => {
 
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <NeonButton className="gap-2" glow>
+            <NeonButton className="gap-2 whitespace-nowrap" glow>
               <UserPlus className="h-4 w-4" />
               Add Staff / Admin
             </NeonButton>
@@ -448,11 +577,21 @@ export const StaffManagement = () => {
             </div>
 
             <DialogFooter>
-              <NeonButton variant="ghost" onClick={() => setIsAddDialogOpen(false)}>
+              <NeonButton variant="ghost" onClick={() => setIsAddDialogOpen(false)} disabled={isInviting}>
                 Cancel
               </NeonButton>
-              <NeonButton onClick={handleAddStaff} glow>
-                Add Staff Member
+              <NeonButton onClick={handleInviteStaff} glow disabled={isInviting}>
+                {isInviting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sending Invite...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send Invitation
+                  </>
+                )}
               </NeonButton>
             </DialogFooter>
           </DialogContent>
@@ -584,7 +723,7 @@ export const StaffManagement = () => {
 
       {/* Staff List */}
       <div className="grid gap-4">
-        {filteredStaff.map((member) => {
+        {!loading && filteredStaff.map((member) => {
           const RoleIcon = roleConfig[member.role].icon;
           const roleVariant = roleConfig[member.role].variant;
 
@@ -615,10 +754,16 @@ export const StaffManagement = () => {
                         <GlowingBadge variant={roleVariant}>
                           {roleConfig[member.role].label}
                         </GlowingBadge>
-                        <StatusPulse
-                          variant={member.status === "active" ? "online" : "offline"}
-                          size="sm"
-                        />
+                        {member.status === "invited" ? (
+                          <GlowingBadge variant="warning">
+                            Invited
+                          </GlowingBadge>
+                        ) : (
+                          <StatusPulse
+                            variant={member.status === "active" ? "online" : "offline"}
+                            size="sm"
+                          />
+                        )}
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-2 text-sm text-muted-foreground">
@@ -668,13 +813,30 @@ export const StaffManagement = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    <NeonButton
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleToggleStatus(member.id)}
-                    >
-                      {member.status === "active" ? "Deactivate" : "Activate"}
-                    </NeonButton>
+                    {member.status === "invited" ? (
+                      <NeonButton
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleResendInvite(member)}
+                        disabled={resendingId === member.id}
+                        className="gap-1"
+                      >
+                        {resendingId === member.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <RefreshCw className="h-4 w-4" />
+                        )}
+                        Resend Invite
+                      </NeonButton>
+                    ) : (
+                      <NeonButton
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleToggleStatus(member.id)}
+                      >
+                        {member.status === "active" ? "Deactivate" : "Activate"}
+                      </NeonButton>
+                    )}
                     <NeonButton variant="secondary" size="icon">
                       <Edit className="h-4 w-4" />
                     </NeonButton>
@@ -696,11 +858,20 @@ export const StaffManagement = () => {
         })}
       </div>
 
-      {filteredStaff.length === 0 && (
+      {loading && (
+        <GlassCard className="py-12 text-center">
+          <Loader2 className="h-12 w-12 text-primary mx-auto mb-3 animate-spin" />
+          <p className="text-lg font-medium mb-1">Loading staff...</p>
+        </GlassCard>
+      )}
+
+      {!loading && filteredStaff.length === 0 && (
         <GlassCard className="py-12 text-center">
           <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
           <p className="text-lg font-medium mb-1">No staff members found</p>
-          <p className="text-sm text-muted-foreground">Try adjusting your filters</p>
+          <p className="text-sm text-muted-foreground">
+            {staff.length === 0 ? "Invite your first team member to get started" : "Try adjusting your filters"}
+          </p>
         </GlassCard>
       )}
     </div>

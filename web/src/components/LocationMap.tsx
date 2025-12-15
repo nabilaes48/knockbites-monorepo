@@ -240,7 +240,7 @@ export const LocationMap = ({
             icon={L.divIcon({
               className: "user-location-marker",
               html: `<div class="relative flex items-center justify-center">
-                <div class="absolute w-16 h-16 bg-blue-400 rounded-full opacity-20 animate-ping"></div>
+                <div class="absolute w-12 h-12 bg-blue-400 rounded-full opacity-30"></div>
                 <div class="relative w-8 h-8 bg-blue-600 border-4 border-white rounded-full shadow-lg flex items-center justify-center">
                   <div class="w-3 h-3 bg-white rounded-full"></div>
                 </div>

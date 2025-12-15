@@ -307,7 +307,10 @@ export const ItemCustomizationModalV2 = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="secondary" onClick={handleAddToCart} className="min-w-[200px]">
+          <Button
+            onClick={handleAddToCart}
+            className="min-w-[200px] bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] hover:from-[#D97706] hover:to-[#B45309] text-white font-semibold shadow-md hover:shadow-lg transition-all"
+          >
             <ShoppingCart className="h-4 w-4 mr-2" />
             Add to Cart - ${calculateTotal().toFixed(2)}
           </Button>

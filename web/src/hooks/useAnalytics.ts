@@ -113,9 +113,9 @@ export function useAnalytics(storeId: number, dateRange: string = 'today') {
       setLoading(true);
       setError(null);
 
-      // Fetch store metrics (KPIs) - using secure version with access control
+      // Fetch store metrics (KPIs)
       const { data: metricsData, error: metricsError } = await supabase
-        .rpc('get_store_metrics_secure', {
+        .rpc('get_store_metrics', {
           p_store_id: storeId,
           p_date_range: dateRange
         });
@@ -125,9 +125,9 @@ export function useAnalytics(storeId: number, dateRange: string = 'today') {
         setMetrics(metricsData[0]);
       }
 
-      // Fetch revenue chart data - using secure version with access control
+      // Fetch revenue chart data
       const { data: revenueChartData, error: revenueError } = await supabase
-        .rpc('get_revenue_chart_data_secure', {
+        .rpc('get_revenue_chart_data', {
           p_store_id: storeId,
           p_date_range: dateRange
         });
@@ -213,9 +213,9 @@ export function useAnalytics(storeId: number, dateRange: string = 'today') {
       if (topCustomersError) throw topCustomersError;
       setTopCustomers(topCustomersData || []);
 
-      // Fetch business insights - using secure version with access control
+      // Fetch business insights
       const { data: insightsData, error: insightsError } = await supabase
-        .rpc('get_business_insights_secure', {
+        .rpc('get_business_insights', {
           p_store_id: storeId
         });
 

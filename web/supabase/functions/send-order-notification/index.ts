@@ -156,14 +156,41 @@ function getEmailBody(type: string, order: OrderData): string {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Order Update</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Update - KnockBites</title>
 </head>
-<body style="font-family: sans-serif; padding: 20px;">
-  <h1 style="color: #2196F3;">Cameron's 24-7 Deli</h1>
-  <h2>Order #${order.order_number}</h2>
-  <p>${statusMessages[type] || "Your order status has been updated."}</p>
-  <p><strong>Total:</strong> $${order.total.toFixed(2)}</p>
-  <p>Thank you for choosing Cameron's!</p>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" style="width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); border-radius: 12px 12px 0 0;">
+              <img src="https://knockbites.com/email-logo.png" alt="KnockBites" style="width: 80px; height: 80px; margin-bottom: 16px; border-radius: 12px;" />
+              <h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #ffffff;">KnockBites</h1>
+              <p style="margin: 10px 0 0; font-size: 14px; color: rgba(255,255,255,0.9);">Order Update</p>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px; font-size: 24px; color: #1f2937;">Order #${order.order_number}</h2>
+              <p style="margin: 0 0 20px; font-size: 16px; color: #374151; line-height: 1.6;">${statusMessages[type] || "Your order status has been updated."}</p>
+              <p style="margin: 0 0 10px; font-size: 16px; color: #374151;"><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 20px 40px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0; font-size: 14px; color: #6b7280;">Thank you for choosing KnockBites!</p>
+              <p style="margin: 10px 0 0; font-size: 12px; color: #9ca3af;">Fresh Food, Fast Service</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
 `;

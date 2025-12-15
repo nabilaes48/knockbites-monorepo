@@ -113,19 +113,15 @@ const GlowingBadge = forwardRef<HTMLSpanElement, GlowingBadgeProps>(
           // Glow effect (dark mode only)
           styles.glow && `dark:${styles.glow}`,
 
-          // Pulse animation
-          pulse && "animate-pulse-glow",
-
           className
         )}
         {...props}
       >
-        {/* Pulse dot for active states */}
+        {/* Status dot for active states */}
         {pulse && (
           <span
             className={cn(
               "w-1.5 h-1.5 rounded-full",
-              "animate-pulse",
               variant === "pending" && "bg-ios-orange dark:bg-neon-orange",
               variant === "preparing" && "bg-ios-blue dark:bg-neon-blue",
               variant === "ready" && "bg-accent dark:bg-neon-green",

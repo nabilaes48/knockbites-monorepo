@@ -10,7 +10,7 @@ import { locations } from "@/data/locations";
 const stores = locations;
 
 interface StoreSelectionProps {
-  onSelectStore: (storeId: number) => void;
+  onSelectStore: (storeId: number, storeName?: string) => void;
 }
 
 export const StoreSelection = ({ onSelectStore }: StoreSelectionProps) => {
@@ -33,7 +33,9 @@ export const StoreSelection = ({ onSelectStore }: StoreSelectionProps) => {
     if (selectedStoreId) {
       // Save selected store to localStorage for persistence
       localStorage.setItem("selectedStore", selectedStoreId.toString());
-      onSelectStore(selectedStoreId);
+      // Find the selected store to get its name
+      const selectedStore = stores.find(store => store.id === selectedStoreId);
+      onSelectStore(selectedStoreId, selectedStore?.name);
     }
   };
 

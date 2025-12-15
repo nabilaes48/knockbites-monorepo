@@ -33,9 +33,10 @@ function getEmailTemplate(code: string): string {
         <table role="presentation" style="width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
           <!-- Header -->
           <tr>
-            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #2196F3 0%, #FF8C42 100%); border-radius: 12px 12px 0 0;">
+            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); border-radius: 12px 12px 0 0;">
+              <img src="https://knockbites.com/email-logo.png" alt="KnockBites" style="width: 80px; height: 80px; margin-bottom: 16px; border-radius: 12px;" />
               <h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #ffffff;">
-                Cameron's 24-7 Deli
+                KnockBites
               </h1>
               <p style="margin: 10px 0 0; font-size: 14px; color: rgba(255,255,255,0.9);">
                 Order Verification
@@ -71,10 +72,7 @@ function getEmailTemplate(code: string): string {
           <tr>
             <td style="padding: 20px 40px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                Cameron's 24-7 Deli - Fresh deli favorites, 24/7
-              </p>
-              <p style="margin: 10px 0 0; font-size: 12px; color: #9ca3af;">
-                29 locations across New York
+                KnockBites - Fresh Food, Fast Service
               </p>
             </td>
           </tr>

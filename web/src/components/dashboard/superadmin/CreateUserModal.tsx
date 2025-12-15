@@ -135,7 +135,7 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalP
 
       // Create user profile
       const { error: profileError } = await supabase
-        .from("staff_profiles")
+        .from("user_profiles")
         .insert(profileData);
 
       if (profileError) {

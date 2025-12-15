@@ -59,7 +59,7 @@ export function UserManagementPanel() {
 
       // Fetch user profiles
       const { data: profiles, error: profilesError } = await supabase
-        .from("staff_profiles")
+        .from("user_profiles")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -110,7 +110,7 @@ export function UserManagementPanel() {
     try {
       // Deactivate user instead of deleting
       const { error } = await supabase
-        .from("staff_profiles")
+        .from("user_profiles")
         .update({ is_active: false })
         .eq("id", userId);
 
@@ -134,7 +134,7 @@ export function UserManagementPanel() {
   const handleToggleActive = async (user: UserProfile) => {
     try {
       const { error } = await supabase
-        .from("staff_profiles")
+        .from("user_profiles")
         .update({ is_active: !user.is_active })
         .eq("id", user.id);
 
@@ -191,7 +191,7 @@ export function UserManagementPanel() {
       <Badge className={badge.className}>
         <Icon className="h-3 w-3 mr-1" />
         {badge.label}
-        {isSystemAdmin && <Crown className="h-3 w-3 ml-1 animate-pulse" />}
+        {isSystemAdmin && <Crown className="h-3 w-3 ml-1" />}
       </Badge>
     );
   };

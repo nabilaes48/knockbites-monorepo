@@ -24,12 +24,16 @@ interface CartItem {
 interface CheckoutProps {
   items: CartItem[];
   storeId: number | null;
+  storeName?: string;
 }
 
-export const Checkout = ({ items, storeId }: CheckoutProps) => {
+export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, profile, isCustomer } = useAuth();
+
+  // Get user's first name for personalization
+  const firstName = profile?.full_name?.split(' ')[0] || '';
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Guest checkout - no login required!
@@ -40,14 +44,17 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
     specialInstructions: "",
   });
 
-  // Email verification state
-  const [verificationStep, setVerificationStep] = useState<'info' | 'verify' | 'verified'>('info');
+  // Email verification state - skip verification if user is logged in
+  const [verificationStep, setVerificationStep] = useState<'info' | 'verify' | 'verified'>(
+    user && isCustomer ? 'verified' : 'info'
+  );
   const [verificationCode, setVerificationCode] = useState("");
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [pendingOrderError, setPendingOrderError] = useState(false);
+  const [fallbackCode, setFallbackCode] = useState<string | null>(null); // Show code when email fails
 
-  // Pre-fill form if user is logged in
+  // Pre-fill form if user is logged in and auto-verify
   useEffect(() => {
     if (user && profile && isCustomer) {
       setGuestInfo({
@@ -56,6 +63,8 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
         email: profile.email || user.email || "",
         specialInstructions: "",
       });
+      // Skip verification for logged-in customers
+      setVerificationStep('verified');
     }
   }, [user, profile, isCustomer]);
 
@@ -112,6 +121,7 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
       console.log(`📧 Verification code generated for ${guestInfo.email}`);
 
       // Send verification email via Edge Function
+      let emailSent = false;
       try {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const response = await fetch(`${supabaseUrl}/functions/v1/send-verification-email`, {
@@ -128,20 +138,29 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
           }),
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.warn('Email sending failed:', errorData);
-          // Still show success - code can be verified even if email fails
+        if (response.ok) {
+          emailSent = true;
+        } else {
+          console.warn('Email sending failed:', await response.text());
         }
       } catch (emailError) {
         console.warn('Email service unavailable:', emailError);
-        // Continue anyway - verification still works
       }
 
-      toast({
-        title: "Verification Code Sent!",
-        description: "Check your email for the 6-digit code.",
-      });
+      if (emailSent) {
+        toast({
+          title: "Verification Code Sent!",
+          description: "Check your email for the 6-digit code.",
+        });
+        setFallbackCode(null);
+      } else {
+        // Email failed but code was generated - show the code directly in UI
+        setFallbackCode(code);
+        toast({
+          title: "Verification Ready",
+          description: "Your code is shown below.",
+        });
+      }
 
       setVerificationStep('verify');
     } catch (error: any) {
@@ -277,8 +296,10 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
 
       setIsProcessing(false);
 
+      // Personalized thank you message
+      const thankYouName = firstName || guestInfo.name.split(' ')[0];
       toast({
-        title: "Order Placed Successfully!",
+        title: `Thank you, ${thankYouName}!`,
         description: `Order #${order.order_number} - Ready in 15-20 minutes`,
       });
 
@@ -300,7 +321,21 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6">Checkout</h2>
+      {/* Personalized Header */}
+      <div className="text-center mb-6">
+        {user && isCustomer && firstName ? (
+          <>
+            <h2 className="text-3xl font-bold mb-2">
+              Almost there, {firstName}!
+            </h2>
+            <p className="text-muted-foreground">
+              Review your order and confirm your details
+            </p>
+          </>
+        ) : (
+          <h2 className="text-3xl font-bold">Checkout</h2>
+        )}
+      </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Checkout Form */}
@@ -364,6 +399,7 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
                         if (verificationStep !== 'info') {
                           setVerificationStep('info');
                           setVerificationCode("");
+                          setFallbackCode(null);
                         }
                       }}
                       disabled={verificationStep === 'verified'}
@@ -413,7 +449,14 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
 
                 {verificationStep === 'verify' && (
                   <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-lg space-y-3">
-                    <p className="text-sm font-medium">Enter the 6-digit code sent to {guestInfo.email}</p>
+                    {fallbackCode ? (
+                      <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg text-center mb-2">
+                        <p className="text-xs text-green-700 dark:text-green-300 mb-1">Your verification code:</p>
+                        <p className="text-2xl font-bold tracking-widest text-green-800 dark:text-green-200">{fallbackCode}</p>
+                      </div>
+                    ) : (
+                      <p className="text-sm font-medium">Enter the 6-digit code sent to {guestInfo.email}</p>
+                    )}
                     <div className="flex justify-center">
                       <InputOTP
                         maxLength={6}
@@ -437,6 +480,7 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
                         onClick={() => {
                           setVerificationStep('info');
                           setVerificationCode("");
+                          setFallbackCode(null);
                         }}
                         className="flex-1"
                       >
@@ -537,9 +581,8 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  variant="secondary"
                   size="lg"
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] hover:from-[#D97706] hover:to-[#B45309] text-white font-semibold shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!isFormValid || isProcessing}
                 >
                   {isProcessing ? "Processing..." : `Place Order - $${total.toFixed(2)}`}
@@ -609,7 +652,7 @@ export const Checkout = ({ items, storeId }: CheckoutProps) => {
                   <div>
                     <p className="font-semibold">Pickup Location</p>
                     <p className="text-muted-foreground">
-                      Store #{storeId || "Not selected"}
+                      {storeName || `Store #${storeId}` || "Not selected"}
                     </p>
                   </div>
                 </div>

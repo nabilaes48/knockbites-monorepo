@@ -60,7 +60,7 @@ export default function SupabaseTest() {
 
       // Try to fetch profile
       const { data: profileData, error: profileError } = await supabase
-        .from('staff_profiles')
+        .from('user_profiles')
         .select('*')
         .eq('id', authData.user?.id)
         .single();

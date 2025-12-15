@@ -109,10 +109,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log('fetchProfile starting, version:', thisVersion, 'userId:', userId)
 
     try {
-      // First, try to fetch from staff_profiles (business users) as it's more common for dashboard access
+      // First, try to fetch from user_profiles (business users) as it's more common for dashboard access
       // Using maybeSingle() instead of single() to avoid 406 errors when no rows found
       const { data: businessData, error: businessError } = await supabase
-        .from('staff_profiles')
+        .from('user_profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle()

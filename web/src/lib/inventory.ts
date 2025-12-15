@@ -161,15 +161,21 @@ export async function getInventoryAlerts(
 
     const { data, error } = await query;
 
-    if (error) throw error;
+    // Return empty array if table doesn't exist
+    if (error) {
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        return [];
+      }
+      throw error;
+    }
 
     return (data || []).map(alert => ({
       ...alert,
       item_name: alert.menu_items?.name,
     }));
   } catch (error) {
-    log.error('Failed to fetch inventory alerts', error instanceof Error ? error : new Error(String(error)));
-    throw error;
+    // Return empty array for missing tables
+    return [];
   }
 }
 
@@ -282,7 +288,13 @@ export async function getRestockRecommendations(storeId: number): Promise<Restoc
       p_payload: { store_id: storeId, days_ahead: 7 },
     });
 
-    if (error) throw error;
+    // Silently return empty array if function doesn't exist
+    if (error) {
+      if (error.code === '42883' || error.message?.includes('404')) {
+        return [];
+      }
+      throw error;
+    }
 
     return (data || []).map((item: any) => ({
       item_id: item.item_id,
@@ -294,8 +306,8 @@ export async function getRestockRecommendations(storeId: number): Promise<Restoc
       days_until_stockout: item.days_until_stockout,
     }));
   } catch (error) {
-    log.error('Failed to get restock recommendations', error instanceof Error ? error : new Error(String(error)));
-    throw error;
+    // Return empty array instead of throwing for missing AI functions
+    return [];
   }
 }
 

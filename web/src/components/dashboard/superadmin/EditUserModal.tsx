@@ -111,7 +111,7 @@ export function EditUserModal({ isOpen, onClose, user, onSuccess }: EditUserModa
 
       // Update user profile
       const { error } = await supabase
-        .from("staff_profiles")
+        .from("user_profiles")
         .update(updateData)
         .eq("id", user.id);
 
