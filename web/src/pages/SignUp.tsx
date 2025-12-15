@@ -38,10 +38,10 @@ const SignUp = () => {
     }
 
     // Validate password length
-    if (formData.password.length < 6) {
+    if (formData.password.length < 8) {
       toast({
         title: "Password too short",
-        description: "Password must be at least 6 characters",
+        description: "Password must be at least 8 characters",
         variant: "destructive",
       });
       setIsLoading(false);
@@ -149,13 +149,13 @@ const SignUp = () => {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="At least 6 characters"
+                  placeholder="At least 8 characters"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
                   required
-                  minLength={6}
+                  minLength={8}
                 />
               </div>
 
@@ -170,7 +170,7 @@ const SignUp = () => {
                     setFormData({ ...formData, confirmPassword: e.target.value })
                   }
                   required
-                  minLength={6}
+                  minLength={8}
                 />
               </div>
 

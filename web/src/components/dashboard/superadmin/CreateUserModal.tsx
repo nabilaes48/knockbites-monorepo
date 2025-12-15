@@ -54,8 +54,8 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalP
         throw new Error("Please fill in all required fields");
       }
 
-      if (formData.password.length < 6) {
-        throw new Error("Password must be at least 6 characters");
+      if (formData.password.length < 8) {
+        throw new Error("Password must be at least 8 characters");
       }
 
       // Create auth user
@@ -228,9 +228,9 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalP
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="Minimum 6 characters"
+              placeholder="Minimum 8 characters"
               required
-              minLength={6}
+              minLength={8}
               className="bg-gray-700 border-gray-600 text-white"
             />
           </div>

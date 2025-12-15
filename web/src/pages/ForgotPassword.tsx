@@ -92,10 +92,10 @@ const ForgotPassword = () => {
       return;
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       toast({
         title: "Password too short",
-        description: "Password must be at least 6 characters.",
+        description: "Password must be at least 8 characters.",
         variant: "destructive",
       });
       return;
@@ -294,7 +294,7 @@ const ForgotPassword = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                       className="pl-10 pr-10 border-gray-300 focus:border-[#FBBF24] focus:ring-[#FBBF24]"
                     />
                     <button
@@ -318,7 +318,7 @@ const ForgotPassword = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                       className="pl-10 border-gray-300 focus:border-[#FBBF24] focus:ring-[#FBBF24]"
                     />
                   </div>

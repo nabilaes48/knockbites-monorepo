@@ -215,10 +215,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signIn = async (email: string, password: string) => {
+    // Check if account is locked
+    const { data: lockoutData } = await supabase.rpc('check_account_lockout', {
+      p_email: email
+    })
+
+    if (lockoutData && lockoutData[0]?.is_locked) {
+      const lockoutUntil = new Date(lockoutData[0].lockout_until)
+      const minutesRemaining = Math.ceil((lockoutUntil.getTime() - Date.now()) / 60000)
+      throw new Error(`Account temporarily locked. Try again in ${minutesRemaining} minute${minutesRemaining !== 1 ? 's' : ''}.`)
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
+
+    // Record login attempt
+    await supabase.rpc('record_login_attempt', {
+      p_email: email,
+      p_success: !error
+    })
+
     if (error) throw error
   }
 
