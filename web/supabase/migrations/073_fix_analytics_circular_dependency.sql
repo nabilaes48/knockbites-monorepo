@@ -16,11 +16,67 @@
 -- Then get_business_insights can safely wrap it
 
 -- =====================================================
--- STEP 1: Drop both functions to clean slate
+-- STEP 1: Drop functions to clean slate
 -- =====================================================
 
 DROP FUNCTION IF EXISTS public.get_business_insights(BIGINT);
 DROP FUNCTION IF EXISTS public.get_business_insights_secure(BIGINT);
+
+-- =====================================================
+-- STEP 1.5: Ensure can_access_analytics exists
+-- This function was defined in migration 048 but may be missing
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION public.can_access_analytics(p_store_id BIGINT DEFAULT NULL)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_role TEXT;
+    v_user_store_id BIGINT;
+    v_assigned_stores BIGINT[];
+BEGIN
+    -- Get user info
+    SELECT role, store_id, assigned_stores
+    INTO v_role, v_user_store_id, v_assigned_stores
+    FROM user_profiles
+    WHERE id = auth.uid();
+
+    -- No profile = no access
+    IF v_role IS NULL THEN
+        RETURN FALSE;
+    END IF;
+
+    -- Customers cannot access analytics
+    IF v_role = 'customer' THEN
+        RETURN FALSE;
+    END IF;
+
+    -- Super admin can access all
+    IF v_role = 'super_admin' THEN
+        RETURN TRUE;
+    END IF;
+
+    -- Staff must have analytics permission
+    IF v_role = 'staff' THEN
+        IF NOT (
+            SELECT permissions @> '["analytics"]'::jsonb
+            FROM user_profiles WHERE id = auth.uid()
+        ) THEN
+            RETURN FALSE;
+        END IF;
+    END IF;
+
+    -- If no specific store requested, allow general access
+    IF p_store_id IS NULL THEN
+        RETURN TRUE;
+    END IF;
+
+    -- Check store access
+    RETURN p_store_id = v_user_store_id
+        OR p_store_id = ANY(v_assigned_stores);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
+GRANT EXECUTE ON FUNCTION public.can_access_analytics(BIGINT) TO authenticated;
 
 -- =====================================================
 -- STEP 2: Create get_business_insights_secure with actual implementation
