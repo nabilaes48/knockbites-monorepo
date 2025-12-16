@@ -447,6 +447,22 @@ struct ModernKitchenOrderCard: View {
                             }
                             .padding(.leading, 44) // Align with item name
                         }
+
+                        // Per-item special instructions/notes
+                        if let notes = item.notes, !notes.isEmpty {
+                            HStack(spacing: 4) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.caption2)
+                                Text("Note: \(notes)")
+                                    .font(AppFonts.caption)
+                            }
+                            .foregroundColor(.warning)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.warning.opacity(0.15))
+                            .cornerRadius(6)
+                            .padding(.leading, 44) // Align with item name
+                        }
                     }
                 }
 
@@ -721,10 +737,34 @@ struct OrderDetailSheet: View {
                                     Text(item.name)
                                         .font(AppFonts.body)
 
+                                    // Customizations on separate lines
                                     if !item.customizations.isEmpty {
-                                        Text(item.customizations.joined(separator: ", "))
-                                            .font(AppFonts.caption)
-                                            .foregroundColor(.textSecondary)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            ForEach(item.customizations, id: \.self) { customization in
+                                                HStack(spacing: 4) {
+                                                    Text("•")
+                                                        .foregroundColor(.brandPrimary)
+                                                    Text(customization)
+                                                        .font(AppFonts.caption)
+                                                        .foregroundColor(.textSecondary)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Per-item special instructions/notes
+                                    if let notes = item.notes, !notes.isEmpty {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "exclamationmark.triangle.fill")
+                                                .font(.caption2)
+                                            Text("Note: \(notes)")
+                                                .font(AppFonts.caption)
+                                        }
+                                        .foregroundColor(.warning)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(Color.warning.opacity(0.15))
+                                        .cornerRadius(6)
                                     }
                                 }
 

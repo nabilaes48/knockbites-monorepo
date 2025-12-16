@@ -13,6 +13,8 @@ interface CartItem {
   quantity: number;
   customizations?: string[]; // Human-readable: ["Cheese: Extra Cheese"]
   selectedOptions?: Record<string, string[]>; // Raw data: {"group_cheese": ["extra_cheese"]}
+  specialInstructions?: string; // Special instructions for this item
+  ingredients?: string[]; // Portion-based ingredients from V2 modal
   image: string;
 }
 
@@ -78,9 +80,28 @@ export const Cart = ({ items, onUpdateItems, onCheckout, compact = false }: Cart
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-sm mb-1 truncate">{item.name}</h4>
-                    <p className="text-sm font-bold text-primary mb-2">
+                    <p className="text-sm font-bold text-primary mb-1">
                       ${item.price.toFixed(2)}
                     </p>
+
+                    {/* Customizations/Ingredients */}
+                    {(item.customizations?.length || item.ingredients?.length) ? (
+                      <div className="mb-2 space-y-0.5">
+                        {(item.ingredients || item.customizations || []).map((custom, idx) => (
+                          <div key={idx} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <span className="w-1 h-1 bg-primary rounded-full flex-shrink-0" />
+                            <span className="truncate">{custom}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    {/* Special Instructions */}
+                    {item.specialInstructions && (
+                      <div className="mb-2 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                        Note: {item.specialInstructions}
+                      </div>
+                    )}
 
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-2">

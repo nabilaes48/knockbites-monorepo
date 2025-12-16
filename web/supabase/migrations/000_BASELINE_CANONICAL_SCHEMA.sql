@@ -855,7 +855,8 @@ CREATE OR REPLACE FUNCTION generate_order_number()
 RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.order_number IS NULL OR NEW.order_number = '' THEN
-    NEW.order_number = 'ORD-' || EXTRACT(EPOCH FROM NOW())::BIGINT;
+    -- Use clock_timestamp() for actual current time, not transaction start time
+    NEW.order_number = 'ORD-' || EXTRACT(EPOCH FROM clock_timestamp())::BIGINT;
   END IF;
   RETURN NEW;
 END;

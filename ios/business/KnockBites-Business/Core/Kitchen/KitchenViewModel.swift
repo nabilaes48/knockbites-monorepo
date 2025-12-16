@@ -127,6 +127,7 @@ struct KitchenOrder: Identifiable {
         let name: String
         let quantity: Int
         let customizations: [String]
+        let notes: String? // Per-item special instructions
     }
 }
 
@@ -294,11 +295,17 @@ class KitchenViewModel: ObservableObject {
             KitchenOrder.OrderItem(
                 name: cartItem.menuItem.name,
                 quantity: cartItem.quantity,
-                customizations: cartItem.customizationSummary.components(separatedBy: "\n").filter { !$0.isEmpty }
+                customizations: cartItem.customizationSummary.components(separatedBy: "\n").filter { !$0.isEmpty },
+                notes: cartItem.specialInstructions.isEmpty ? nil : cartItem.specialInstructions
             )
         }
 
-        let specialInstructions = order.items.first(where: { !$0.specialInstructions.isEmpty })?.specialInstructions
+        // Collect all item notes for order-level special instructions
+        let allNotes = order.items
+            .filter { !$0.specialInstructions.isEmpty }
+            .map { "\($0.menuItem.name): \($0.specialInstructions)" }
+            .joined(separator: " | ")
+        let specialInstructions = allNotes.isEmpty ? nil : allNotes
 
         // Map OrderStatus to KitchenOrderStatus
         let kitchenStatus = mapOrderStatusToKitchenStatus(order.status)

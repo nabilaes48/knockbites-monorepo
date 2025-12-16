@@ -177,27 +177,35 @@ struct CartItemRow: View {
                     .font(AppFonts.headline)
                     .foregroundColor(.textPrimary)
 
-                // Customizations
-                if !item.selectedOptions.isEmpty {
-                    ForEach(Array(item.selectedOptions.keys), id: \.self) { groupId in
-                        if let group = item.menuItem.customizationGroups.first(where: { $0.id == groupId }),
-                           let optionIds = item.selectedOptions[groupId] {
-                            let options = group.options.filter { optionIds.contains($0.id) }
-                            Text(options.map { $0.name }.joined(separator: ", "))
-                                .font(AppFonts.caption)
-                                .foregroundColor(.textSecondary)
-                                .lineLimit(2)
+                // Customizations (each on separate line)
+                if !item.customizationsList.isEmpty {
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(item.customizationsList, id: \.self) { customization in
+                            HStack(spacing: 6) {
+                                Circle()
+                                    .fill(Color.brandPrimary)
+                                    .frame(width: 5, height: 5)
+                                Text(customization)
+                                    .font(AppFonts.caption)
+                                    .foregroundColor(.textSecondary)
+                            }
                         }
                     }
                 }
 
                 // Special Instructions
                 if let instructions = item.specialInstructions, !instructions.isEmpty {
-                    Text("Note: \(instructions)")
-                        .font(AppFonts.caption)
-                        .foregroundColor(.textSecondary)
-                        .italic()
-                        .lineLimit(2)
+                    HStack(spacing: 4) {
+                        Image(systemName: "note.text")
+                            .font(.system(size: 10))
+                        Text("Note: \(instructions)")
+                            .font(AppFonts.caption)
+                    }
+                    .foregroundColor(.warning)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.warning.opacity(0.15))
+                    .cornerRadius(6)
                 }
 
                 Spacer()

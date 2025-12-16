@@ -381,14 +381,18 @@ struct OrderItemsSection: View {
                                 .font(AppFonts.body)
                                 .foregroundColor(.textPrimary)
 
-                            if !item.selectedOptions.isEmpty {
-                                ForEach(Array(item.selectedOptions.keys), id: \.self) { groupId in
-                                    if let group = item.menuItem.customizationGroups.first(where: { $0.id == groupId }),
-                                       let optionIds = item.selectedOptions[groupId] {
-                                        let options = group.options.filter { optionIds.contains($0.id) }
-                                        Text(options.map { $0.name }.joined(separator: ", "))
-                                            .font(AppFonts.caption)
-                                            .foregroundColor(.textSecondary)
+                            // Customizations (each on separate line)
+                            if !item.customizationsList.isEmpty {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    ForEach(item.customizationsList, id: \.self) { customization in
+                                        HStack(spacing: 4) {
+                                            Circle()
+                                                .fill(Color.brandPrimary)
+                                                .frame(width: 4, height: 4)
+                                            Text(customization)
+                                                .font(AppFonts.caption)
+                                                .foregroundColor(.textSecondary)
+                                        }
                                     }
                                 }
                             }

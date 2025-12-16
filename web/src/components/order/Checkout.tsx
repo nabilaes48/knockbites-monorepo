@@ -270,6 +270,12 @@ export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
         if (item.customizations && item.customizations.length > 0) {
           console.log(`   🎛️ Customizations: ${item.customizations.join(', ')}`);
         }
+        if (item.ingredients && item.ingredients.length > 0) {
+          console.log(`   🥗 Ingredients: ${item.ingredients.join(', ')}`);
+        }
+        if (item.specialInstructions) {
+          console.log(`   📝 Special instructions: ${item.specialInstructions}`);
+        }
 
         return {
           order_id: order.id,
@@ -277,12 +283,13 @@ export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
           item_name: item.name,
           item_price: item.price,
           quantity: item.quantity,
-          // Human-readable customizations for business app display
-          customizations: item.customizations || [],
+          // Human-readable customizations for business app display (prefer ingredients from V2 modal)
+          customizations: item.ingredients || item.customizations || [],
           // Raw customization data for advanced processing (iOS format)
           selected_options: item.selectedOptions || {},
           subtotal: item.price * item.quantity,
-          notes: null,
+          // Special instructions for this specific item
+          notes: item.specialInstructions || null,
         };
       });
 
@@ -644,13 +651,32 @@ export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
               {/* Items */}
               <div className="space-y-3">
                 {items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span>
-                      {item.quantity}x {item.name}
-                    </span>
-                    <span className="font-semibold">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </span>
+                  <div key={item.id} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>
+                        {item.quantity}x {item.name}
+                      </span>
+                      <span className="font-semibold">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                    {/* Customizations/Ingredients */}
+                    {(item.customizations?.length || item.ingredients?.length) ? (
+                      <div className="ml-4 space-y-0.5">
+                        {(item.ingredients || item.customizations || []).map((custom: string, idx: number) => (
+                          <div key={idx} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <span className="w-1 h-1 bg-primary rounded-full flex-shrink-0" />
+                            <span>{custom}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                    {/* Special Instructions */}
+                    {item.specialInstructions && (
+                      <div className="ml-4 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                        Note: {item.specialInstructions}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

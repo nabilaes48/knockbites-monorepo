@@ -183,37 +183,58 @@ const Order = () => {
                   {/* Cart Items */}
                   <div className="flex-1 overflow-y-auto space-y-3 pr-2">
                     {cartItems.map((item) => (
-                      <div key={item.cartId} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{item.name}</h4>
-                          <p className="text-sm text-primary font-medium">${item.price.toFixed(2)}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => updateQuantity(item.cartId, (item.quantity || 1) - 1)}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-8 text-center font-semibold">{item.quantity || 1}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => updateQuantity(item.cartId, (item.quantity || 1) + 1)}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-destructive"
-                            onClick={() => removeItem(item.cartId)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                      <div key={item.cartId} className="p-3 bg-muted/30 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold">{item.name}</h4>
+                            <p className="text-sm text-primary font-medium">${item.price.toFixed(2)}</p>
+
+                            {/* Customizations/Ingredients */}
+                            {(item.customizations?.length || item.ingredients?.length) ? (
+                              <div className="mt-1.5 space-y-0.5">
+                                {(item.ingredients || item.customizations || []).map((custom: string, idx: number) => (
+                                  <div key={idx} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                    <span className="w-1 h-1 bg-primary rounded-full flex-shrink-0" />
+                                    <span>{custom}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
+
+                            {/* Special Instructions */}
+                            {item.specialInstructions && (
+                              <div className="mt-1.5 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                                Note: {item.specialInstructions}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => updateQuantity(item.cartId, (item.quantity || 1) - 1)}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="w-8 text-center font-semibold">{item.quantity || 1}</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => updateQuantity(item.cartId, (item.quantity || 1) + 1)}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive"
+                              onClick={() => removeItem(item.cartId)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
