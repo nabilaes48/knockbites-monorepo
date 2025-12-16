@@ -19,6 +19,9 @@ class DashboardViewModel: ObservableObject {
     private var realtimeTask: Task<Void, Never>?
     private var refreshTimer: Timer?
 
+    // Track order IDs for new order detection
+    private var knownOrderIds: Set<String> = []
+
     // Auto-refresh interval (30 seconds)
     private let autoRefreshInterval: TimeInterval = 30
 
@@ -65,7 +68,25 @@ class DashboardViewModel: ObservableObject {
                 let targetStoreId = storeId.flatMap { Int($0) } ?? SupabaseConfig.storeId
 
                 // Fetch orders from Supabase
-                orders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)
+                let newOrders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)
+
+                // Detect new orders
+                let newOrderIds = Set(newOrders.map { $0.id })
+                let trulyNewOrders = newOrders.filter { !knownOrderIds.contains($0.id) }
+
+                // Play sound for new received orders (skip on initial load)
+                if !knownOrderIds.isEmpty && !trulyNewOrders.isEmpty {
+                    let newReceivedOrders = trulyNewOrders.filter { $0.status == .received }
+                    if !newReceivedOrders.isEmpty {
+                        print("🔔 Dashboard: New order(s) detected: \(newReceivedOrders.map { $0.orderNumber })")
+                        SoundManager.shared.notifyNewOrder(orderNumber: newReceivedOrders.first?.orderNumber ?? "")
+                    }
+                }
+
+                // Update state
+                knownOrderIds = newOrderIds
+                orders = newOrders
+
                 print("✅ Loaded \(orders.count) orders from Supabase for store \(targetStoreId)")
             } catch {
                 print("❌ Failed to load orders: \(error)")
@@ -104,6 +125,11 @@ class DashboardViewModel: ObservableObject {
                 // Update selected order if it's the current one
                 if selectedOrder?.id == order.id {
                     selectedOrder = updatedOrder
+                }
+
+                // Play sound when order is ready
+                if newStatus == .ready {
+                    SoundManager.shared.playOrderReadySound()
                 }
 
                 // Auto-print receipt based on settings
@@ -168,7 +194,24 @@ class DashboardViewModel: ObservableObject {
 
                 // Reload orders when new order comes in
                 do {
-                    self.orders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)
+                    let newOrders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)
+
+                    // Detect new orders
+                    let newOrderIds = Set(newOrders.map { $0.id })
+                    let trulyNewOrders = newOrders.filter { !self.knownOrderIds.contains($0.id) }
+
+                    // Play sound for new received orders
+                    if !self.knownOrderIds.isEmpty && !trulyNewOrders.isEmpty {
+                        let newReceivedOrders = trulyNewOrders.filter { $0.status == .received }
+                        if !newReceivedOrders.isEmpty {
+                            print("🔔 Real-time: New order(s) detected: \(newReceivedOrders.map { $0.orderNumber })")
+                            SoundManager.shared.notifyNewOrder(orderNumber: newReceivedOrders.first?.orderNumber ?? "")
+                        }
+                    }
+
+                    // Update state
+                    self.knownOrderIds = newOrderIds
+                    self.orders = newOrders
                 } catch {
                     print("❌ Failed to refresh orders: \(error)")
                 }

@@ -145,6 +145,10 @@ class KitchenViewModel: ObservableObject {
     private var realtimeTask: Task<Void, Never>?
     private var refreshTimer: Timer?
 
+    // Track order count for new order detection
+    private var previousOrderCount: Int = 0
+    private var knownOrderIds: Set<String> = []
+
     // Auto-refresh interval (30 seconds)
     private let autoRefreshInterval: TimeInterval = 30
 
@@ -173,9 +177,27 @@ class KitchenViewModel: ObservableObject {
                 let supabaseOrders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)
 
                 // Convert to KitchenOrder format
-                orders = supabaseOrders.map { order in
+                let newOrders = supabaseOrders.map { order in
                     convertToKitchenOrder(order)
                 }
+
+                // Detect new orders (orders we haven't seen before)
+                let newOrderIds = Set(newOrders.map { $0.id })
+                let trulyNewOrders = newOrders.filter { !knownOrderIds.contains($0.id) }
+
+                // Play sound for new orders (skip on initial load)
+                if !knownOrderIds.isEmpty && !trulyNewOrders.isEmpty {
+                    // Found new orders!
+                    let newReceivedOrders = trulyNewOrders.filter { $0.status == .received }
+                    if !newReceivedOrders.isEmpty {
+                        print("🔔 New order(s) detected: \(newReceivedOrders.map { $0.orderNumber })")
+                        SoundManager.shared.notifyNewOrder(orderNumber: newReceivedOrders.first?.orderNumber ?? "")
+                    }
+                }
+
+                // Update known order IDs
+                knownOrderIds = newOrderIds
+                orders = newOrders
 
                 print("✅ Kitchen loaded \(orders.count) orders from Supabase for store \(targetStoreId)")
             } catch {
@@ -211,7 +233,24 @@ class KitchenViewModel: ObservableObject {
                 // Reload orders when new order comes in
                 do {
                     let supabaseOrders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)
-                    self.orders = supabaseOrders.map { self.convertToKitchenOrder($0) }
+                    let newOrders = supabaseOrders.map { self.convertToKitchenOrder($0) }
+
+                    // Detect truly new orders
+                    let newOrderIds = Set(newOrders.map { $0.id })
+                    let trulyNewOrders = newOrders.filter { !self.knownOrderIds.contains($0.id) }
+
+                    // Play sound for new received orders
+                    if !self.knownOrderIds.isEmpty && !trulyNewOrders.isEmpty {
+                        let newReceivedOrders = trulyNewOrders.filter { $0.status == .received }
+                        if !newReceivedOrders.isEmpty {
+                            print("🔔 Real-time: New order(s) detected: \(newReceivedOrders.map { $0.orderNumber })")
+                            SoundManager.shared.notifyNewOrder(orderNumber: newReceivedOrders.first?.orderNumber ?? "")
+                        }
+                    }
+
+                    // Update state
+                    self.knownOrderIds = newOrderIds
+                    self.orders = newOrders
                 } catch {
                     print("❌ Failed to refresh kitchen orders: \(error)")
                 }
@@ -278,6 +317,11 @@ class KitchenViewModel: ObservableObject {
                     withAnimation(.spring(response: 0.3)) {
                         orders[index].status = newStatus
                     }
+                }
+
+                // Play sound when order is ready
+                if newStatus == .ready {
+                    SoundManager.shared.playOrderReadySound()
                 }
 
                 print("✅ Updated order \(order.orderNumber) to \(newStatus.displayName)")
