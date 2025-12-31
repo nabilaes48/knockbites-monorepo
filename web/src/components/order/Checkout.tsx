@@ -383,9 +383,20 @@ export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
                       <div className="bg-white dark:bg-gray-800 rounded-md p-3">
                         <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                           <Phone className="h-3 w-3" />
-                          Phone
+                          Phone {!guestInfo.phone && <span className="text-red-500">*</span>}
                         </div>
-                        <p className="font-medium">{guestInfo.phone || 'Not set'}</p>
+                        {guestInfo.phone ? (
+                          <p className="font-medium">{guestInfo.phone}</p>
+                        ) : (
+                          <Input
+                            type="tel"
+                            placeholder="(555) 123-4567"
+                            value={guestInfo.phone}
+                            onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
+                            className="h-8 text-sm mt-1"
+                            required
+                          />
+                        )}
                       </div>
                       <div className="bg-white dark:bg-gray-800 rounded-md p-3">
                         <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
@@ -395,6 +406,11 @@ export const Checkout = ({ items, storeId, storeName }: CheckoutProps) => {
                         <p className="font-medium text-sm truncate">{guestInfo.email || 'Not set'}</p>
                       </div>
                     </div>
+                    {!guestInfo.phone && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400">
+                        Please enter your phone number so we can text you when your order is ready.
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <>
