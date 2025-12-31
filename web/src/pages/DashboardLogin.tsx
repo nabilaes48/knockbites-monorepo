@@ -140,8 +140,8 @@ const DashboardLogin = () => {
         <Card>
           <CardHeader className="text-center">
             <img
-              src="/knockbites-logo.png"
-              alt="KnockBites"
+              src="/knockbites-business-logo.png"
+              alt="KnockBites Business"
               className="w-16 h-16 rounded-xl mx-auto mb-4 shadow-lg"
             />
             <CardTitle className="text-2xl">Business Dashboard</CardTitle>
