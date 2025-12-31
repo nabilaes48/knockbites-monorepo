@@ -108,6 +108,10 @@ const IngredientManagement = () => {
     default_portion: "regular",
   });
 
+  // Inline editing state
+  const [editingCell, setEditingCell] = useState<{ id: number; field: "light" | "regular" | "extra" } | null>(null);
+  const [editingValue, setEditingValue] = useState("");
+
   useEffect(() => {
     fetchIngredients();
   }, []);
@@ -253,6 +257,51 @@ const IngredientManagement = () => {
     } catch (err) {
       console.error("Error toggling active:", err);
     }
+  };
+
+  // Inline price editing
+  const startEditingPrice = (id: number, field: "light" | "regular" | "extra", currentValue: number) => {
+    setEditingCell({ id, field });
+    setEditingValue(currentValue.toString());
+  };
+
+  const cancelEditingPrice = () => {
+    setEditingCell(null);
+    setEditingValue("");
+  };
+
+  const saveInlinePrice = async (ingredient: IngredientTemplate) => {
+    if (!editingCell) return;
+
+    const newPrice = parseFloat(editingValue) || 0;
+    const updatedPricing = {
+      ...ingredient.portion_pricing,
+      [editingCell.field]: newPrice,
+    };
+
+    try {
+      const { error } = await supabase
+        .from("ingredient_templates")
+        .update({ portion_pricing: updatedPricing })
+        .eq("id", ingredient.id);
+
+      if (error) throw error;
+
+      // Update local state immediately for snappy UX
+      setIngredients((prev) =>
+        prev.map((ing) =>
+          ing.id === ingredient.id ? { ...ing, portion_pricing: updatedPricing } : ing
+        )
+      );
+
+      toast({ title: "Price updated", description: `${ingredient.name} ${editingCell.field} price saved` });
+    } catch (err) {
+      console.error("Error saving price:", err);
+      toast({ title: "Error", description: "Failed to save price", variant: "destructive" });
+    }
+
+    setEditingCell(null);
+    setEditingValue("");
   };
 
   const formatPrice = (price: number) => {
@@ -412,19 +461,79 @@ const IngredientManagement = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-center">
-                            <span className={ing.portion_pricing.light > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}>
-                              {formatPrice(ing.portion_pricing.light)}
-                            </span>
+                            {editingCell?.id === ing.id && editingCell.field === "light" ? (
+                              <Input
+                                type="number"
+                                step="0.25"
+                                min="0"
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onBlur={() => saveInlinePrice(ing)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") saveInlinePrice(ing);
+                                  if (e.key === "Escape") cancelEditingPrice();
+                                }}
+                                className="w-20 h-8 text-center mx-auto"
+                                autoFocus
+                              />
+                            ) : (
+                              <button
+                                onClick={() => startEditingPrice(ing.id, "light", ing.portion_pricing.light)}
+                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.light > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                              >
+                                {formatPrice(ing.portion_pricing.light)}
+                              </button>
+                            )}
                           </TableCell>
                           <TableCell className="text-center">
-                            <span className={ing.portion_pricing.regular > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}>
-                              {formatPrice(ing.portion_pricing.regular)}
-                            </span>
+                            {editingCell?.id === ing.id && editingCell.field === "regular" ? (
+                              <Input
+                                type="number"
+                                step="0.25"
+                                min="0"
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onBlur={() => saveInlinePrice(ing)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") saveInlinePrice(ing);
+                                  if (e.key === "Escape") cancelEditingPrice();
+                                }}
+                                className="w-20 h-8 text-center mx-auto"
+                                autoFocus
+                              />
+                            ) : (
+                              <button
+                                onClick={() => startEditingPrice(ing.id, "regular", ing.portion_pricing.regular)}
+                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.regular > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                              >
+                                {formatPrice(ing.portion_pricing.regular)}
+                              </button>
+                            )}
                           </TableCell>
                           <TableCell className="text-center">
-                            <span className={ing.portion_pricing.extra > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}>
-                              {formatPrice(ing.portion_pricing.extra)}
-                            </span>
+                            {editingCell?.id === ing.id && editingCell.field === "extra" ? (
+                              <Input
+                                type="number"
+                                step="0.25"
+                                min="0"
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onBlur={() => saveInlinePrice(ing)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") saveInlinePrice(ing);
+                                  if (e.key === "Escape") cancelEditingPrice();
+                                }}
+                                className="w-20 h-8 text-center mx-auto"
+                                autoFocus
+                              />
+                            ) : (
+                              <button
+                                onClick={() => startEditingPrice(ing.id, "extra", ing.portion_pricing.extra)}
+                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.extra > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                              >
+                                {formatPrice(ing.portion_pricing.extra)}
+                              </button>
+                            )}
                           </TableCell>
                           <TableCell className="text-center">
                             <Switch
