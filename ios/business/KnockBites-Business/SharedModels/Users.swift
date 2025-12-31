@@ -245,8 +245,8 @@ public struct SharedCustomerFavorite: Codable, Identifiable {
 
 // MARK: - Shared User Profile (Business Staff)
 
-/// Canonical user profile model matching the Supabase `staff_profiles` table.
-/// Used for Business app staff accounts.
+/// Canonical user profile model matching the Supabase `user_profiles` table.
+/// Used for Business app staff accounts (staff, managers, admins, super_admins).
 public struct SharedUserProfile: Codable, Identifiable {
     public let id: String
     public let fullName: String?

@@ -16,8 +16,9 @@ enum TableNames {
     static let orderItems = "order_items"
     static let menuItems = "menu_items"
     static let menuCategories = "menu_categories"
-    static let staffProfiles = "staff_profiles"
-    static let staff = "staff"
+    // DEPRECATED: staff_profiles is legacy, use userProfiles instead
+    // static let staffProfiles = "staff_profiles"
+    static let userProfiles = "user_profiles"
 
     // MARK: - Loyalty Tables
     static let loyaltyPrograms = "loyalty_programs"

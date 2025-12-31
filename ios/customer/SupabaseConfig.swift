@@ -1,10 +1,9 @@
 import Foundation
 
 enum SupabaseConfig {
-    // KnockBites Staging Project
+    // KnockBites Staging Project (knockbites-staging)
     static let url = "https://dsmefhuhflixoevexafm.supabase.co"
-    static let anonKey =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzbWVmaHVoZmxpeG9ldmV4YWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1OTMzNjQsImV4cCI6MjA4MTE2OTM2NH0.tp-ddm8D9H4P_CLaM7ZZtKZ2DzpH2iPeDJjlj4C2P2E"
+    static let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzbWVmaHVoZmxpeG9ldmV4YWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1OTMzNjQsImV4cCI6MjA4MTE2OTM2NH0.tp-ddm8D9H4P_CLaM7ZZtKZ2DzpH2iPeDJjlj4C2P2E"
 
     // Storage bucket name (update this to match your Supabase storage bucket)
     static let storageBucket = "menu-images"

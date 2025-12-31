@@ -4,9 +4,13 @@
 //
 //  Created by Claude Code on 11/12/25.
 //
+//  NOTE: This file is only available in DEBUG builds.
+//  It provides mock data for SwiftUI previews and development testing.
+//
 
 import Foundation
 
+#if DEBUG
 class MockDataService {
     static let shared = MockDataService()
 
@@ -392,3 +396,4 @@ class MockDataService {
         )
     }
 }
+#endif

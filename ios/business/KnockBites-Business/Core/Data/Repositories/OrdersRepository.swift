@@ -187,7 +187,7 @@ class OrdersRepository {
 
     func subscribeToOrders(storeId: Int? = nil, onInsert: @escaping () -> Void) -> Task<Void, Never> {
         Task {
-            let targetStoreId = storeId ?? SupabaseConfig.storeId
+            let targetStoreId = storeId ?? SecureSupabaseConfig.storeId
             let channelName = "orders_store_\(targetStoreId)"
 
             let channel = client.channel(channelName)

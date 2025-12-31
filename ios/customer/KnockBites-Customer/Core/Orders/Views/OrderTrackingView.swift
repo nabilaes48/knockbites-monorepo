@@ -362,6 +362,7 @@ struct OrderTrackingItemRow: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let mockOrder = Order(
         id: "order_1",
@@ -389,3 +390,4 @@ struct OrderTrackingItemRow: View {
 
     return OrderTrackingView(order: mockOrder)
 }
+#endif

@@ -83,7 +83,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch analytics summary
         let summary = try await SupabaseManager.shared.fetchAnalyticsSummary(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startDate,
             endDate: endDate
         )
@@ -108,7 +108,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch daily sales for chart
         let dailySales = try await SupabaseManager.shared.fetchDailySales(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             days: 7
         )
 
@@ -126,7 +126,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch top selling items
         let topSellingItems = try await SupabaseManager.shared.fetchTopSellingItems(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startDate,
             endDate: endDate,
             limit: 5
@@ -148,7 +148,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch order type distribution
         let distribution = try await SupabaseManager.shared.fetchOrderTypeDistribution(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startDate,
             endDate: endDate
         )
@@ -194,7 +194,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch today's analytics
         let summary = try await SupabaseManager.shared.fetchAnalyticsSummary(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startOfToday,
             endDate: endDate
         )
@@ -220,7 +220,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch top selling items for today
         let topSellingItems = try await SupabaseManager.shared.fetchTopSellingItems(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startOfToday,
             endDate: endDate,
             limit: 5
@@ -241,7 +241,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch order type distribution
         let distribution = try await SupabaseManager.shared.fetchOrderTypeDistribution(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startOfToday,
             endDate: endDate
         )
@@ -268,7 +268,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch monthly summary
         let summary = try await SupabaseManager.shared.fetchAnalyticsSummary(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startDate,
             endDate: endDate
         )
@@ -290,7 +290,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch monthly sales (30 days)
         let dailySales = try await SupabaseManager.shared.fetchDailySales(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             days: 30
         )
 
@@ -308,7 +308,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch top selling items
         let topSellingItems = try await SupabaseManager.shared.fetchTopSellingItems(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startDate,
             endDate: endDate,
             limit: 5
@@ -329,7 +329,7 @@ class AnalyticsViewModel: ObservableObject {
 
         // Fetch order type distribution
         let distribution = try await SupabaseManager.shared.fetchOrderTypeDistribution(
-            storeId: SupabaseConfig.storeId,
+            storeId: SecureSupabaseConfig.storeId,
             startDate: startDate,
             endDate: endDate
         )

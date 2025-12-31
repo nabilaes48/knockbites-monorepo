@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CookieConsent } from "@/components/CookieConsent";
 import ErrorBoundary, { PageLoadingSkeleton } from "@/components/system/ErrorBoundary";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import logger from "@/lib/logger";
 
 // Lazy load all page components for code splitting
@@ -22,6 +23,7 @@ const Order = lazy(() => import("./pages/Order"));
 const OrderTracking = lazy(() => import("./pages/OrderTracking"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const DashboardLogin = lazy(() => import("./pages/DashboardLogin"));
+const DashboardForgotPassword = lazy(() => import("./pages/DashboardForgotPassword"));
 const SuperAdminDashboard = lazy(() => import("./pages/SuperAdminDashboard"));
 const RequestStaffAccess = lazy(() => import("./pages/RequestStaffAccess"));
 const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
@@ -66,19 +68,20 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/order" element={<Order />} />
                 <Route path="/order/tracking/:orderId" element={<OrderTracking />} />
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard" element={<ProtectedRoute requiredRole="staff"><Dashboard /></ProtectedRoute>} />
                 <Route path="/dashboard/login" element={<DashboardLogin />} />
-                <Route path="/super-admin" element={<SuperAdminDashboard />} />
+                <Route path="/dashboard/forgot-password" element={<DashboardForgotPassword />} />
+                <Route path="/super-admin" element={<ProtectedRoute requiredRole="super_admin"><SuperAdminDashboard /></ProtectedRoute>} />
                 <Route path="/request-staff-access" element={<RequestStaffAccess />} />
-                <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+                <Route path="/customer/dashboard" element={<ProtectedRoute redirectTo="/signin"><CustomerDashboard /></ProtectedRoute>} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/cookie-policy" element={<CookiePolicy />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/supabase-test" element={<SupabaseTest />} />
-                <Route path="/analytics" element={<PremiumAnalyticsPage />} />
-                <Route path="/system-health" element={<SystemHealth />} />
+                <Route path="/analytics" element={<ProtectedRoute requiredPermission="analytics"><PremiumAnalyticsPage /></ProtectedRoute>} />
+                <Route path="/system-health" element={<ProtectedRoute requiredRole="super_admin"><SystemHealth /></ProtectedRoute>} />
                 <Route path="/set-password" element={<SetPassword />} />
                 <Route path="/reset-password" element={<SetPassword />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

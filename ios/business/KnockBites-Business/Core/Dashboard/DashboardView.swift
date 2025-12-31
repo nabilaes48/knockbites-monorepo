@@ -48,7 +48,7 @@ struct DashboardView: View {
                         if let storeId = authManager.userProfile?.storeId {
                             storeIdString = String(storeId)
                         } else {
-                            storeIdString = String(SupabaseConfig.storeId)
+                            storeIdString = String(SecureSupabaseConfig.storeId)
                         }
                         await viewModel.refreshAsync(storeId: storeIdString)
                     }
@@ -72,7 +72,7 @@ struct DashboardView: View {
                         if let storeId = authManager.userProfile?.storeId {
                             storeIdString = String(storeId)
                         } else {
-                            storeIdString = String(SupabaseConfig.storeId)
+                            storeIdString = String(SecureSupabaseConfig.storeId)
                         }
                         viewModel.refresh(storeId: storeIdString)
                     }) {
@@ -87,7 +87,7 @@ struct DashboardView: View {
                 }
             }
             .appErrorAlert(error: $appError) {
-                let storeIdString = authManager.userProfile?.storeId.map { String($0) } ?? String(SupabaseConfig.storeId)
+                let storeIdString = authManager.userProfile?.storeId.map { String($0) } ?? String(SecureSupabaseConfig.storeId)
                 viewModel.refresh(storeId: storeIdString)
             }
             .onChange(of: viewModel.errorMessage) { _, newValue in
@@ -104,7 +104,7 @@ struct DashboardView: View {
                 storeIdString = String(storeId)
             } else {
                 // Super admins or users without assigned stores default to store 1
-                storeIdString = String(SupabaseConfig.storeId)
+                storeIdString = String(SecureSupabaseConfig.storeId)
                 print("ℹ️ No store assigned to user, defaulting to store \(storeIdString)")
             }
 

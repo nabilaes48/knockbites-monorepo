@@ -41,7 +41,7 @@ class StoreAnalyticsViewModel: ObservableObject {
             isLoading = true
 
             do {
-                let storeId = SupabaseConfig.storeId
+                let storeId = SecureSupabaseConfig.storeId
                 let dateRange = selectedPeriod.apiValue
 
                 // Fetch store metrics

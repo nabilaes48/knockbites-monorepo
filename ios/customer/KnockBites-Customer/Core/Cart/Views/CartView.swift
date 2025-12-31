@@ -268,6 +268,7 @@ struct CartItemRow: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let cartViewModel = CartViewModel()
     let mockItems = MockDataService.shared.getMenuItems()
@@ -278,3 +279,4 @@ struct CartItemRow: View {
     return CartView()
         .environmentObject(cartViewModel)
 }
+#endif

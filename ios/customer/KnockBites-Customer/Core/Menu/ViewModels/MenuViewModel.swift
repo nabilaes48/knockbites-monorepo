@@ -30,7 +30,6 @@ class MenuViewModel: ObservableObject {
     // Recently Viewed
     @Published var recentlyViewedIds: [String] = []
 
-    private let mockDataService = MockDataService.shared
     private let maxHistoryItems = 20
     private let maxRecentlyViewed = 50
 

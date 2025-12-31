@@ -40,7 +40,7 @@ class NotificationsAnalyticsViewModel: ObservableObject {
     }
 
     private func loadRealData(for period: NotificationPeriod) async {
-        let storeId = SupabaseConfig.storeId
+        let storeId = SecureSupabaseConfig.storeId
         let service = NotificationsService.shared
 
         do {

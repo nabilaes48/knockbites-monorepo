@@ -128,6 +128,13 @@ struct KitchenOrder: Identifiable {
         let quantity: Int
         let customizations: [String]
         let notes: String? // Per-item special instructions
+
+        init(name: String, quantity: Int, customizations: [String], notes: String? = nil) {
+            self.name = name
+            self.quantity = quantity
+            self.customizations = customizations
+            self.notes = notes
+        }
     }
 }
 
@@ -171,7 +178,7 @@ class KitchenViewModel: ObservableObject {
 
             do {
                 // Use Jay's Deli store ID by default
-                let targetStoreId = storeId ?? SupabaseConfig.storeId
+                let targetStoreId = storeId ?? SecureSupabaseConfig.storeId
 
                 // Fetch orders from Supabase
                 let supabaseOrders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)
@@ -222,7 +229,7 @@ class KitchenViewModel: ObservableObject {
         realtimeTask?.cancel()
 
         // Use Jay's Deli store ID by default
-        let targetStoreId = storeId ?? SupabaseConfig.storeId
+        let targetStoreId = storeId ?? SecureSupabaseConfig.storeId
 
         // Subscribe to real-time order updates
         realtimeTask = SupabaseManager.shared.subscribeToOrders(storeId: targetStoreId) { [weak self] in

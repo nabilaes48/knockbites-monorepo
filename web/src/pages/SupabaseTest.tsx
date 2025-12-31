@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
+import { Navigate } from "react-router-dom";
 
 export default function SupabaseTest() {
+  // SECURITY FIX: Block access in production
+  if (import.meta.env.PROD) {
+    return <Navigate to="/" replace />;
+  }
   const [status, setStatus] = useState("Testing...");
   const [stores, setStores] = useState<any[]>([]);
   const [error, setError] = useState("");
@@ -44,11 +49,18 @@ export default function SupabaseTest() {
     setProfileData(null);
 
     try {
-      // Try to sign in
-      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: 'admin@knockbites.com',
-        password: 'admin123',
-      });
+      // SECURITY FIX: Removed hardcoded test credentials
+      // Test with current session instead
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        setAuthError("No active session. Please sign in first via /signin or /dashboard/login");
+        setAuthStatus("✗ Not authenticated");
+        return;
+      }
+
+      const authData = { user: sessionData.session.user };
+      const signInError = null;
 
       if (signInError) {
         setAuthError("Sign-in Error: " + signInError.message);

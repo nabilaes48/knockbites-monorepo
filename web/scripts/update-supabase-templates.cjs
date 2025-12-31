@@ -1,8 +1,19 @@
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') });
 
-const PROJECT_REF = 'dsmefhuhflixoevexafm';
-const ACCESS_TOKEN = 'sbp_86c1b541ae88aee7674276351c17209a719e9284';
+// SECURITY: Load credentials from environment variables
+// To use this script, set these in your .env.local file:
+//   SUPABASE_PROJECT_REF=your_project_ref
+//   SUPABASE_ACCESS_TOKEN=your_access_token (from Supabase Dashboard > Settings > API)
+const PROJECT_REF = process.env.SUPABASE_PROJECT_REF;
+const ACCESS_TOKEN = process.env.SUPABASE_ACCESS_TOKEN;
+
+if (!PROJECT_REF || !ACCESS_TOKEN) {
+  console.error('ERROR: Missing required environment variables.');
+  console.error('Please set SUPABASE_PROJECT_REF and SUPABASE_ACCESS_TOKEN in .env.local');
+  process.exit(1);
+}
 
 const templatesDir = path.join(__dirname, '..', 'email-templates');
 

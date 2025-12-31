@@ -276,6 +276,7 @@ struct OrderStatusBadge: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let viewModel = OrderViewModel()
 
@@ -312,3 +313,4 @@ struct OrderStatusBadge: View {
             viewModel.saveOrder(mockOrder1)
         }
 }
+#endif

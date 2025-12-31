@@ -51,7 +51,7 @@ class MarketingViewModel: ObservableObject {
         Task {
             do {
                 let notificationResponses = try await SupabaseManager.shared.fetchNotifications(
-                    storeId: SupabaseConfig.storeId
+                    storeId: SecureSupabaseConfig.storeId
                 )
 
                 // Convert to UI model
@@ -100,7 +100,7 @@ class MarketingViewModel: ObservableObject {
         Task {
             do {
                 let couponResponses = try await SupabaseManager.shared.fetchCoupons(
-                    storeId: SupabaseConfig.storeId
+                    storeId: SecureSupabaseConfig.storeId
                 )
 
                 // Convert to UI model
@@ -237,7 +237,7 @@ class CreateNotificationViewModel: ObservableObject {
                 }
 
                 let request = SupabaseManager.CreateNotificationRequest(
-                    store_id: SupabaseConfig.storeId,
+                    store_id: SecureSupabaseConfig.storeId,
                     title: title,
                     body: message,
                     image_url: nil, // TODO: Upload image if needed
@@ -301,7 +301,7 @@ class CreateCouponViewModel: ObservableObject {
                 }
 
                 let request = SupabaseManager.CreateCouponRequest(
-                    store_id: SupabaseConfig.storeId,
+                    store_id: SecureSupabaseConfig.storeId,
                     code: couponCode.uppercased(),
                     name: title,
                     description: description.isEmpty ? nil : description,
@@ -349,7 +349,7 @@ class LoyaltyProgramViewModel: ObservableObject {
         Task {
             do {
                 let marketingService = MarketingService.shared
-                let storeId = SupabaseConfig.storeId
+                let storeId = SecureSupabaseConfig.storeId
 
                 // Fetch loyalty program
                 guard let programResponse = try await marketingService.getLoyaltyProgram(storeId: storeId) else {
@@ -475,7 +475,7 @@ class CustomerLoyaltyViewModel: ObservableObject {
                 let marketingService = MarketingService.shared
 
                 // Get loyalty program first
-                guard let program = try await marketingService.getLoyaltyProgram(storeId: SupabaseConfig.storeId) else {
+                guard let program = try await marketingService.getLoyaltyProgram(storeId: SecureSupabaseConfig.storeId) else {
                     await MainActor.run {
                         customers = []
                         isLoading = false
@@ -648,7 +648,7 @@ class ReferralProgramViewModel: ObservableObject {
             do {
                 // Fetch referral program
                 let programResponse = try await SupabaseManager.shared.fetchReferralProgram(
-                    storeId: SupabaseConfig.storeId
+                    storeId: SecureSupabaseConfig.storeId
                 )
 
                 referralProgram = ReferralProgram(
@@ -754,7 +754,7 @@ class MarketingAnalyticsViewModel: ObservableObject {
 
                 // Fetch notifications
                 let notifications = try await SupabaseManager.shared.fetchNotifications(
-                    storeId: SupabaseConfig.storeId
+                    storeId: SecureSupabaseConfig.storeId
                 )
 
                 // Filter by period
@@ -777,7 +777,7 @@ class MarketingAnalyticsViewModel: ObservableObject {
 
                 // Fetch coupons
                 let coupons = try await SupabaseManager.shared.fetchCoupons(
-                    storeId: SupabaseConfig.storeId
+                    storeId: SecureSupabaseConfig.storeId
                 )
 
                 totalActiveCoupons = coupons.filter { $0.is_active }.count

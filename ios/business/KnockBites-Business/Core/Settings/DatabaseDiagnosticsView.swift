@@ -19,7 +19,7 @@ struct DatabaseDiagnosticsView: View {
                 HStack {
                     Text("Supabase URL")
                     Spacer()
-                    Text(SupabaseConfig.url)
+                    Text(SecureSupabaseConfig.url)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -27,7 +27,7 @@ struct DatabaseDiagnosticsView: View {
                 HStack {
                     Text("Store ID")
                     Spacer()
-                    Text("\(SupabaseConfig.storeId)")
+                    Text("\(SecureSupabaseConfig.storeId)")
                         .fontWeight(.semibold)
                 }
 

@@ -452,7 +452,9 @@ struct CustomizationOptionRow: View {
     }
 }
 
+#if DEBUG
 #Preview {
     ItemDetailView(item: MockDataService.shared.getMenuItems()[3])
         .environmentObject(CartViewModel())
 }
+#endif

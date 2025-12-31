@@ -47,7 +47,7 @@ class DatabaseDiagnosticsViewModel: ObservableObject {
             isLoadingOrders = true
             errorMessage = nil
 
-            let result = await diagnosticsService.fetchOrderDiagnostics(storeId: SupabaseConfig.storeId)
+            let result = await diagnosticsService.fetchOrderDiagnostics(storeId: SecureSupabaseConfig.storeId)
 
             recentOrders = result.recentOrders
             totalOrders = result.totalOrders
@@ -56,7 +56,7 @@ class DatabaseDiagnosticsViewModel: ObservableObject {
             errorMessage = result.errorMessage
 
             if result.errorMessage == nil {
-                print("✅ Fetched \(result.totalOrders) orders for store \(SupabaseConfig.storeId)")
+                print("✅ Fetched \(result.totalOrders) orders for store \(SecureSupabaseConfig.storeId)")
             } else {
                 print("⚠️ \(result.errorMessage ?? "")")
             }
@@ -70,7 +70,7 @@ class DatabaseDiagnosticsViewModel: ObservableObject {
             isLoadingOrders = true
             errorMessage = nil
 
-            let result = await diagnosticsService.fetchAllStoreOrders(currentStoreId: SupabaseConfig.storeId)
+            let result = await diagnosticsService.fetchAllStoreOrders(currentStoreId: SecureSupabaseConfig.storeId)
 
             totalOrders = result.totalOrders
             errorMessage = result.message

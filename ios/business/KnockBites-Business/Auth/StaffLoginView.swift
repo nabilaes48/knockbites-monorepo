@@ -13,6 +13,7 @@ struct StaffLoginView: View {
     @State private var password: String = ""
     @State private var showPassword: Bool = false
     @State private var showingError: Bool = false
+    @State private var showForgotPassword: Bool = false
 
     var body: some View {
         ZStack {
@@ -62,7 +63,7 @@ struct StaffLoginView: View {
                                 .foregroundColor(.textSecondary)
                                 .frame(width: 20)
 
-                            TextField("admin@knockbitesconnect.com", text: $email)
+                            TextField("you@example.com", text: $email)
                                 .textContentType(.emailAddress)
                                 .autocapitalization(.none)
                                 .keyboardType(.emailAddress)
@@ -129,6 +130,13 @@ struct StaffLoginView: View {
                         .cornerRadius(CornerRadius.md)
                     }
                     .disabled(!canSignIn || authManager.isLoading)
+
+                    // Forgot password button
+                    Button("Forgot Password?") {
+                        showForgotPassword = true
+                    }
+                    .font(AppFonts.subheadline)
+                    .foregroundColor(.brandPrimary)
 
                     // Error message
                     if let errorMessage = authManager.errorMessage {
@@ -199,13 +207,11 @@ struct StaffLoginView: View {
             }
         }
         .onAppear {
-            // Pre-fill credentials for testing
-            #if DEBUG
-            if email.isEmpty {
-                email = "admin@knockbitesconnect.com"
-                password = "admin123"
-            }
-            #endif
+            // SECURITY FIX: Removed hardcoded test credentials
+            // For testing, use environment variables or a secure test configuration
+        }
+        .sheet(isPresented: $showForgotPassword) {
+            ForgotPasswordView()
         }
     }
 

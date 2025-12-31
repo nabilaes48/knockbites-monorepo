@@ -259,6 +259,7 @@ struct DietaryBadge: View {
     }
 }
 
+#if DEBUG
 #Preview {
     ScrollView {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: Spacing.md) {
@@ -269,3 +270,4 @@ struct DietaryBadge: View {
         .padding()
     }
 }
+#endif

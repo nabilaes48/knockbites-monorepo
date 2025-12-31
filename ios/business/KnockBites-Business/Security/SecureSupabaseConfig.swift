@@ -2,70 +2,33 @@
 //  SecureSupabaseConfig.swift
 //  KnockBites Business App
 //
-//  Secure configuration loader that reads from Info.plist
-//  Values are injected from xcconfig files at build time
-//
-//  MIGRATION: Replace SupabaseConfig.swift with this file
-//  CVE-2025-KB001: Hardcoded credentials replaced with build-time injection
+//  Secure configuration for Supabase connection
 //
 
 import Foundation
 
-/// Secure configuration that reads from build-time injected values
-/// NEVER hardcode credentials in this file
+/// Supabase configuration
 enum SecureSupabaseConfig {
 
     // MARK: - Supabase Connection
 
-    static var url: String {
-        guard let url = Bundle.main.infoDictionary?["SUPABASE_URL"] as? String,
-              !url.isEmpty,
-              url != "$(SUPABASE_URL)" else {
-            #if DEBUG
-            fatalError("""
-                SUPABASE_URL not configured.
+    static let url = "https://dsmefhuhflixoevexafm.supabase.co"
 
-                To fix:
-                1. Create Config/Debug.xcconfig from Config/Debug.xcconfig.example
-                2. Add your Supabase URL
-                3. Ensure the xcconfig is linked in your target's Build Settings
-                """)
-            #else
-            assertionFailure("SUPABASE_URL not configured")
-            return ""
-            #endif
-        }
-        return url
-    }
+    static let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzbWVmaHVoZmxpeG9ldmV4YWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1OTMzNjQsImV4cCI6MjA4MTE2OTM2NH0.tp-ddm8D9H4P_CLaM7ZZtKZ2DzpH2iPeDJjlj4C2P2E"
 
-    static var anonKey: String {
-        guard let key = Bundle.main.infoDictionary?["SUPABASE_ANON_KEY"] as? String,
-              !key.isEmpty,
-              key != "$(SUPABASE_ANON_KEY)",
-              key != "YOUR_ANON_KEY_HERE" else {
-            #if DEBUG
-            fatalError("""
-                SUPABASE_ANON_KEY not configured.
+    // MARK: - Store Configuration
 
-                To fix:
-                1. Create Config/Debug.xcconfig from Config/Debug.xcconfig.example
-                2. Add your Supabase anon key
-                3. Ensure the xcconfig is linked in your target's Build Settings
-                """)
-            #else
-            assertionFailure("SUPABASE_ANON_KEY not configured")
-            return ""
-            #endif
-        }
-        return key
-    }
+    /// Default store ID for single-store operations
+    /// In production, prefer using AuthManager.userProfile?.storeId for user-specific store access
+    static let storeId: Int = 1
 
     // MARK: - Environment
 
-    static var environment: Environment {
-        let env = Bundle.main.infoDictionary?["ENVIRONMENT"] as? String ?? "debug"
-        return Environment(rawValue: env) ?? .debug
-    }
+    #if DEBUG
+    static let environment: Environment = .debug
+    #else
+    static let environment: Environment = .production
+    #endif
 
     enum Environment: String {
         case debug
@@ -85,8 +48,5 @@ enum SecureSupabaseConfig {
         print("   Key: \(anonKey.prefix(20))...[redacted]")
         print("   Environment: \(environment.rawValue)")
         #endif
-
-        _ = url
-        _ = anonKey
     }
 }

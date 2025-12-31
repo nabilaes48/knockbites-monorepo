@@ -7,13 +7,15 @@ class SupabaseManager {
     let client: SupabaseClient
 
     private init() {
-        guard let url = URL(string: SupabaseConfig.url) else {
-            fatalError("Invalid Supabase URL")
+        // SECURITY FIX (CVE-2025-KB001): Use SecureSupabaseConfig instead of hardcoded values
+        // SecureSupabaseConfig reads from Info.plist which gets values from xcconfig at build time
+        guard let url = URL(string: SecureSupabaseConfig.url) else {
+            fatalError("Invalid Supabase URL - check your xcconfig configuration")
         }
 
         client = SupabaseClient(
             supabaseURL: url,
-            supabaseKey: SupabaseConfig.anonKey
+            supabaseKey: SecureSupabaseConfig.anonKey
         )
     }
 
@@ -354,7 +356,7 @@ class SupabaseManager {
         return enrichedOrders
     }
 
-    /// Enrich orders with actual user names from the staff_profiles table
+    /// Enrich orders with actual user names from the user_profiles or customers table
     private func enrichOrdersWithUserNames(_ orders: [Order]) async -> [Order] {
         // Get unique user IDs
         let userIds = Array(Set(orders.map { $0.userId }))
@@ -362,14 +364,14 @@ class SupabaseManager {
         guard !userIds.isEmpty else { return orders }
 
         do {
-            // Fetch user profiles from staff_profiles table
+            // Fetch user profiles from user_profiles table (canonical business users table)
             struct UserProfileResponse: Codable {
                 let id: String
                 let full_name: String
             }
 
             let profiles: [UserProfileResponse] = try await client
-                .from("staff_profiles")
+                .from("user_profiles")
                 .select("id, full_name")
                 .in("id", values: userIds)
                 .execute()
@@ -433,7 +435,7 @@ class SupabaseManager {
     func subscribeToOrders(storeId: Int? = nil, onInsert: @escaping () -> Void) -> Task<Void, Never> {
         Task {
             // Use provided storeId or default to Jay's Deli (store_id = 1)
-            let targetStoreId = storeId ?? SupabaseConfig.storeId
+            let targetStoreId = storeId ?? SecureSupabaseConfig.storeId
             let channelName = "orders_store_\(targetStoreId)"
 
             let channel = client.channel(channelName)
@@ -1518,16 +1520,20 @@ class SupabaseManager {
     func addLoyaltyPoints(customerLoyaltyId: Int, points: Int, reason: String) async throws {
         print("🔄 Adding \(points) loyalty points...")
 
-        // First, get current balance
-        let currentLoyalty = try await client
+        // First, get current balance - SECURITY FIX: Use safe casting instead of force unwrap
+        struct LoyaltyBalance: Codable {
+            let total_points: Int
+        }
+
+        let loyaltyData: LoyaltyBalance = try await client
             .from("customer_loyalty")
             .select("total_points")
             .eq("id", value: customerLoyaltyId)
             .single()
             .execute()
-            .value as! [String: Any]
+            .value
 
-        let currentPoints = currentLoyalty["total_points"] as! Int
+        let currentPoints = loyaltyData.total_points
         let newBalance = currentPoints + points
 
         // Create transaction record

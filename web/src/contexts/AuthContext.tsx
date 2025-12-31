@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import logger from '@/lib/logger'
 import type { User, Session } from '@supabase/supabase-js'
 
 // Business user profile (staff, manager, admin, super_admin)
@@ -82,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth event:', event, 'User:', session?.user?.id)
+      logger.debug('Auth event:', { event, userId: session?.user?.id })
       setSession(session)
       setUser(session?.user ?? null)
 
@@ -106,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = async (userId: string) => {
     // Increment version to track this fetch
     const thisVersion = ++fetchVersionRef.current
-    console.log('fetchProfile starting, version:', thisVersion, 'userId:', userId)
+    logger.debug('fetchProfile starting', { version: thisVersion, userId })
 
     try {
       // First, try to fetch from user_profiles (business users) as it's more common for dashboard access
@@ -119,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Check if this fetch is still current
       if (thisVersion !== fetchVersionRef.current) {
-        console.log('Stale fetch (staff), ignoring. thisVersion:', thisVersion, 'current:', fetchVersionRef.current)
+        logger.debug('Stale fetch (staff), ignoring', { thisVersion, current: fetchVersionRef.current })
         return
       }
 
@@ -134,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           can_hire_roles: Array.isArray(businessData.can_hire_roles) ? businessData.can_hire_roles : [],
           is_system_admin: businessData.is_system_admin || false,
         }
-        console.log('Setting business profile, version:', thisVersion)
+        logger.debug('Setting business profile', { version: thisVersion })
         setProfile(profileData)
         setLoading(false)
         return
@@ -148,11 +149,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .maybeSingle()
 
-      console.log('Customer query result:', { customerData, customerError, userId })
+      logger.debug('Customer query result', { customerData, customerError, userId })
 
       // Check if this fetch is still current
       if (thisVersion !== fetchVersionRef.current) {
-        console.log('Stale fetch (customers), ignoring. thisVersion:', thisVersion, 'current:', fetchVersionRef.current)
+        logger.debug('Stale fetch (customers), ignoring', { thisVersion, current: fetchVersionRef.current })
         return
       }
 
@@ -162,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ...customerData,
           role: 'customer',
         }
-        console.log('Setting customer profile, version:', thisVersion)
+        logger.debug('Setting customer profile', { version: thisVersion })
         setProfile(customerProfile)
         setLoading(false)
         return
@@ -170,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // If no profile exists, try to create a customer profile
       // This handles users who signed up before the trigger was in place
-      console.log('No profile found, attempting to create customer profile for:', userId)
+      logger.debug('No profile found, attempting to create customer profile', { userId })
 
       // Get user email from auth
       const { data: { user: authUser } } = await supabase.auth.getUser()
@@ -188,7 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single()
 
         if (newCustomer && !createError) {
-          console.log('Created customer profile:', newCustomer)
+          logger.debug('Created customer profile', { newCustomer })
           const customerProfile: CustomerProfile = {
             ...newCustomer,
             role: 'customer',
@@ -197,16 +198,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false)
           return
         } else {
-          console.log('Failed to create customer profile:', createError)
+          logger.warn('Failed to create customer profile', { error: createError })
         }
       }
 
       // If still no profile, set loading false
-      console.log('No profile found and could not create one, version:', thisVersion)
+      logger.debug('No profile found and could not create one', { version: thisVersion })
       setLoading(false)
 
     } catch (error) {
-      console.error('Error fetching profile:', error)
+      logger.error('Error fetching profile', error)
       // Only set loading false if this is still the current fetch
       if (thisVersion === fetchVersionRef.current) {
         setLoading(false)
@@ -215,15 +216,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signIn = async (email: string, password: string) => {
-    // Check if account is locked
-    const { data: lockoutData } = await supabase.rpc('check_account_lockout', {
-      p_email: email
-    })
+    // SECURITY FIX: Check if account is locked with fail-closed error handling
+    // If rate limiting RPC fails, we fail closed (block login) rather than allowing bypass
+    try {
+      const { data: lockoutData, error: lockoutError } = await supabase.rpc('check_account_lockout', {
+        p_email: email
+      })
 
-    if (lockoutData && lockoutData[0]?.is_locked) {
-      const lockoutUntil = new Date(lockoutData[0].lockout_until)
-      const minutesRemaining = Math.ceil((lockoutUntil.getTime() - Date.now()) / 60000)
-      throw new Error(`Account temporarily locked. Try again in ${minutesRemaining} minute${minutesRemaining !== 1 ? 's' : ''}.`)
+      // SECURITY: If lockout check fails, block login to prevent bypass
+      if (lockoutError) {
+        logger.error('Rate limiting check failed', lockoutError)
+        throw new Error('Unable to verify account status. Please try again.')
+      }
+
+      if (lockoutData && lockoutData[0]?.is_locked) {
+        const lockoutUntil = new Date(lockoutData[0].lockout_until)
+        const minutesRemaining = Math.ceil((lockoutUntil.getTime() - Date.now()) / 60000)
+        throw new Error(`Account temporarily locked. Try again in ${minutesRemaining} minute${minutesRemaining !== 1 ? 's' : ''}.`)
+      }
+    } catch (err) {
+      // Re-throw known errors, but also catch unexpected failures
+      if (err instanceof Error && (err.message.includes('locked') || err.message.includes('verify account'))) {
+        throw err
+      }
+      logger.error('Rate limiting system error', err)
+      throw new Error('Unable to verify account status. Please try again.')
     }
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -231,11 +248,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
     })
 
-    // Record login attempt
-    await supabase.rpc('record_login_attempt', {
-      p_email: email,
-      p_success: !error
-    })
+    // SECURITY FIX: Record login attempt with error handling
+    // Non-blocking - we don't fail the login if recording fails, but we log it
+    try {
+      const { error: recordError } = await supabase.rpc('record_login_attempt', {
+        p_email: email,
+        p_success: !error
+      })
+      if (recordError) {
+        logger.error('Failed to record login attempt', recordError)
+      }
+    } catch (recordErr) {
+      logger.error('Error recording login attempt', recordErr)
+    }
 
     if (error) throw error
   }

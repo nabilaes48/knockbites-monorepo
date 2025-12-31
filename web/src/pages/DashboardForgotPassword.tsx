@@ -6,18 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Mail, CheckCircle, Lock, Eye, EyeOff, Loader2, Building2 } from "lucide-react";
-import heroImage from "@/assets/hero-food.jpg";
 import { supabase } from "@/lib/supabase";
 
 type Step = "email" | "code" | "password" | "success";
 
 /**
- * Customer Password Reset Page
- * - Located at /forgot-password
- * - For customers accessing their personal accounts
- * - Redirects to /signin after reset
+ * Staff/Business Password Reset Page
+ * - Located at /dashboard/forgot-password
+ * - For staff, managers, admins accessing the business dashboard
+ * - Redirects to /dashboard/login after reset
  */
-const ForgotPassword = () => {
+const DashboardForgotPassword = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("email");
@@ -33,17 +32,17 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      // Verify this email belongs to a customer before sending code
-      const { data: customer } = await supabase
-        .from('customers')
+      // Verify this email belongs to a staff member before sending code
+      const { data: staffProfile } = await supabase
+        .from('user_profiles')
         .select('id')
         .eq('email', email.toLowerCase())
         .maybeSingle();
 
-      if (!customer) {
+      if (!staffProfile) {
         toast({
           title: "Email Not Found",
-          description: "This email is not registered as a customer account. If you're a staff member, please use the staff password reset.",
+          description: "This email is not registered as a staff account. Please check your email or contact an administrator.",
           variant: "destructive",
         });
         setIsLoading(false);
@@ -132,15 +131,18 @@ const ForgotPassword = () => {
 
       if (error) throw error;
 
+      // Sign out after password update (staff should log in fresh)
+      await supabase.auth.signOut();
+
       setStep("success");
       toast({
         title: "Password updated!",
         description: "Your password has been changed successfully.",
       });
 
-      // Redirect to customer login after 2 seconds
+      // Redirect to staff login after 2 seconds
       setTimeout(() => {
-        navigate("/signin");
+        navigate("/dashboard/login");
       }, 2000);
     } catch (error: any) {
       toast({
@@ -167,66 +169,56 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
-      style={{
-        backgroundImage: `url(${heroImage})`,
-      }}
-    >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/70 to-[#FBBF24]/40" />
-
-      <div className="w-full max-w-md relative z-10">
+    <div className="min-h-screen bg-gradient-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         <Link
-          to="/signin"
-          className="inline-flex items-center gap-2 text-sm text-white/90 hover:text-white mb-6 transition-colors"
+          to="/dashboard/login"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Sign In
+          Back to Staff Login
         </Link>
 
-        <Card className="shadow-xl border-0 bg-white/95 backdrop-blur-sm">
+        <Card>
           <CardHeader className="text-center">
-            <img src="/knockbites-logo.png" alt="KnockBites" className="w-16 h-16 rounded-xl mx-auto mb-4 shadow-lg" />
-            <CardTitle className="text-3xl text-gray-900">
-              <span className="text-[#FBBF24]">Knock</span>Bites
-            </CardTitle>
-            <CardDescription className="text-gray-600">
-              {getStepTitle()}
-            </CardDescription>
+            <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <Building2 className="h-8 w-8 text-primary" />
+            </div>
+            <CardTitle className="text-2xl">Business Portal</CardTitle>
+            <CardDescription>{getStepTitle()}</CardDescription>
           </CardHeader>
 
           <CardContent>
             {/* Step 1: Enter Email */}
             {step === "email" && (
               <>
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div className="mb-6 p-4 bg-muted rounded-lg">
                   <div className="flex items-start gap-3">
-                    <Mail className="h-5 w-5 text-[#FBBF24] mt-0.5" />
-                    <p className="text-sm text-gray-600">
-                      Enter your email address and we'll send you a verification code.
+                    <Mail className="h-5 w-5 text-primary mt-0.5" />
+                    <p className="text-sm text-muted-foreground">
+                      Enter your staff email address and we'll send you an 8-digit verification code.
                     </p>
                   </div>
                 </div>
 
                 <form onSubmit={handleSendCode} className="space-y-4">
                   <div>
-                    <Label htmlFor="email" className="text-gray-700">Email</Label>
+                    <Label htmlFor="email">Staff Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="you@example.com"
+                      placeholder="staff@knockbites.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="border-gray-300 focus:border-[#FBBF24] focus:ring-[#FBBF24]"
                     />
                   </div>
 
                   <Button
                     type="submit"
+                    variant="secondary"
                     size="lg"
-                    className="w-full bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] hover:from-[#D97706] hover:to-[#B45309] text-white font-semibold shadow-md hover:shadow-lg transition-all"
+                    className="w-full"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -249,15 +241,15 @@ const ForgotPassword = () => {
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="h-8 w-8 text-green-600" />
                   </div>
-                  <p className="text-gray-700 font-medium">Code sent!</p>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-foreground font-medium">Code sent!</p>
+                  <p className="text-sm text-muted-foreground mt-2">
                     We've sent an 8-digit verification code to <span className="font-medium">{email}</span>
                   </p>
                 </div>
 
                 <form onSubmit={handleVerifyCode} className="space-y-4">
                   <div>
-                    <Label htmlFor="code" className="text-gray-700">Verification Code</Label>
+                    <Label htmlFor="code">Verification Code</Label>
                     <Input
                       id="code"
                       type="text"
@@ -266,15 +258,16 @@ const ForgotPassword = () => {
                       onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
                       required
                       maxLength={8}
-                      className="border-gray-300 focus:border-[#FBBF24] focus:ring-[#FBBF24] text-center font-mono text-xl tracking-widest"
+                      className="text-center font-mono text-xl tracking-widest"
                     />
-                    <p className="text-xs text-gray-400 mt-1">Enter the 8-digit code from your email</p>
+                    <p className="text-xs text-muted-foreground mt-1">Enter the 8-digit code from your email</p>
                   </div>
 
                   <Button
                     type="submit"
+                    variant="secondary"
                     size="lg"
-                    className="w-full bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] hover:from-[#D97706] hover:to-[#B45309] text-white font-semibold shadow-md hover:shadow-lg transition-all"
+                    className="w-full"
                     disabled={isLoading || code.length < 8}
                   >
                     {isLoading ? (
@@ -288,14 +281,14 @@ const ForgotPassword = () => {
                   </Button>
                 </form>
 
-                <p className="text-xs text-gray-400 text-center mt-4">
+                <p className="text-xs text-muted-foreground text-center mt-4">
                   Didn't receive the code? Check your spam folder or{" "}
                   <button
                     onClick={() => {
                       setStep("email");
                       setCode("");
                     }}
-                    className="text-[#FBBF24] hover:text-[#D97706] hover:underline"
+                    className="text-primary hover:underline"
                   >
                     try again
                   </button>
@@ -307,9 +300,9 @@ const ForgotPassword = () => {
             {step === "password" && (
               <form onSubmit={handleSetPassword} className="space-y-4">
                 <div>
-                  <Label htmlFor="password" className="text-gray-700">New Password</Label>
+                  <Label htmlFor="password">New Password</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
@@ -318,12 +311,12 @@ const ForgotPassword = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="pl-10 pr-10 border-gray-300 focus:border-[#FBBF24] focus:ring-[#FBBF24]"
+                      className="pl-10 pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -331,9 +324,9 @@ const ForgotPassword = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="confirmPassword" className="text-gray-700">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="confirmPassword"
                       type={showPassword ? "text" : "password"}
@@ -342,18 +335,19 @@ const ForgotPassword = () => {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="pl-10 border-gray-300 focus:border-[#FBBF24] focus:ring-[#FBBF24]"
+                      className="pl-10"
                     />
                   </div>
                   {password && confirmPassword && password !== confirmPassword && (
-                    <p className="text-sm text-red-500 mt-1">Passwords don't match</p>
+                    <p className="text-sm text-destructive mt-1">Passwords don't match</p>
                   )}
                 </div>
 
                 <Button
                   type="submit"
+                  variant="secondary"
                   size="lg"
-                  className="w-full bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] hover:from-[#D97706] hover:to-[#B45309] text-white font-semibold shadow-md hover:shadow-lg transition-all"
+                  className="w-full"
                   disabled={isLoading || password !== confirmPassword}
                 >
                   {isLoading ? (
@@ -375,33 +369,24 @@ const ForgotPassword = () => {
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-gray-700 font-medium">Password updated successfully!</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Redirecting to login...
+                  <p className="text-foreground font-medium">Password updated successfully!</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Redirecting to staff login...
                   </p>
                 </div>
-                <Loader2 className="h-5 w-5 animate-spin mx-auto text-[#FBBF24]" />
+                <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary" />
               </div>
             )}
 
             {step !== "success" && (
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Remember your password?{" "}
                   <Link
-                    to="/signin"
-                    className="text-[#FBBF24] hover:text-[#D97706] hover:underline font-semibold"
+                    to="/dashboard/login"
+                    className="text-primary hover:underline font-semibold"
                   >
                     Sign in
-                  </Link>
-                </p>
-                <p className="text-xs text-gray-500 mt-2">
-                  Staff member?{" "}
-                  <Link
-                    to="/dashboard/forgot-password"
-                    className="text-[#FBBF24] hover:text-[#D97706] hover:underline"
-                  >
-                    Reset staff password
                   </Link>
                 </p>
               </div>
@@ -413,4 +398,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default DashboardForgotPassword;

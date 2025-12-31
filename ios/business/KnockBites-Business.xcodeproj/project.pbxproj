@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		87E5C0A82ECC9BEF00F0780F /* SupabaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E5C0A72ECC9BEF00F0780F /* SupabaseConfig.swift */; };
 		87E5C0AE2ECC9C6C00F0780F /* SupabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E5C0AD2ECC9C6C00F0780F /* SupabaseManager.swift */; };
 		87E5C0B42ECCA07C00F0780F /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 87E5C0B32ECCA07C00F0780F /* Supabase */; };
 /* End PBXBuildFile section */
@@ -33,7 +32,6 @@
 		871459892EC52CA700DEBE15 /* KnockBites-Business.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KnockBites-Business.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		871459962EC52CA800DEBE15 /* KnockBites-BusinessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "KnockBites-BusinessTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		871459A02EC52CA800DEBE15 /* KnockBites-BusinessUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "KnockBites-BusinessUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		87E5C0A72ECC9BEF00F0780F /* SupabaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseConfig.swift; sourceTree = "<group>"; };
 		87E5C0AD2ECC9C6C00F0780F /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,7 +82,6 @@
 		871459802EC52CA700DEBE15 = {
 			isa = PBXGroup;
 			children = (
-				87E5C0A72ECC9BEF00F0780F /* SupabaseConfig.swift */,
 				87E5C0AD2ECC9C6C00F0780F /* SupabaseManager.swift */,
 				8714598B2EC52CA700DEBE15 /* KnockBites-Business */,
 				871459992EC52CA800DEBE15 /* KnockBites-BusinessTests */,
@@ -259,7 +256,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				87E5C0AE2ECC9C6C00F0780F /* SupabaseManager.swift in Sources */,
-				87E5C0A82ECC9BEF00F0780F /* SupabaseConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,7 +430,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.-camerons.app.KnockBites-Business";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.business";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -466,7 +462,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.-camerons.app.KnockBites-Business";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.business";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -488,7 +484,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.-camerons.app.KnockBites-BusinessTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.businessTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -510,7 +506,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.-camerons.app.KnockBites-BusinessTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.businessTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -530,7 +526,7 @@
 				DEVELOPMENT_TEAM = HLG9GLVFW6;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.-camerons.app.KnockBites-BusinessUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.businessUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -550,7 +546,7 @@
 				DEVELOPMENT_TEAM = HLG9GLVFW6;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.-camerons.app.KnockBites-BusinessUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.knockbites.businessUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

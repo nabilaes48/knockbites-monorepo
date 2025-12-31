@@ -17,6 +17,7 @@ class AuthManager: ObservableObject {
     @Published var isAuthenticated = false
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var isResettingPassword = false
 
     private let supabase = SupabaseManager.shared.client
     private var authStateTask: Task<Void, Never>?
@@ -35,13 +36,19 @@ class AuthManager: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
+        // Don't auto-authenticate during password reset flow
+        guard !isResettingPassword else {
+            DebugLogger.info("Session check skipped - password reset in progress")
+            return
+        }
+
         do {
             let session = try await supabase.auth.session
             isAuthenticated = true
-            print("✅ Active session found for user: \(session.user.email ?? "unknown")")
+            DebugLogger.success("Active session found for user: \(session.user.email ?? "unknown")")
         } catch {
             isAuthenticated = false
-            print("ℹ️ No active session found")
+            DebugLogger.info("No active session found")
         }
     }
 
@@ -50,18 +57,26 @@ class AuthManager: ObservableObject {
             for await state in supabase.auth.authStateChanges {
                 switch state.event {
                 case .signedIn:
-                    self.isAuthenticated = true
-                    print("✅ User signed in: \(state.session?.user.email ?? "unknown")")
+                    // Don't auto-authenticate during password reset flow
+                    if !self.isResettingPassword {
+                        self.isAuthenticated = true
+                        DebugLogger.success("User signed in: \(state.session?.user.email ?? "unknown")")
+                    } else {
+                        DebugLogger.info("Sign in event ignored - password reset in progress")
+                    }
 
                 case .signedOut:
                     self.isAuthenticated = false
                     self.currentUser = nil
-                    print("ℹ️ User signed out")
+                    DebugLogger.info("User signed out")
 
                 case .initialSession:
-                    if state.session != nil {
+                    // Don't auto-authenticate during password reset flow
+                    if state.session != nil && !self.isResettingPassword {
                         self.isAuthenticated = true
-                        print("✅ Initial session loaded")
+                        DebugLogger.success("Initial session loaded")
+                    } else if self.isResettingPassword {
+                        DebugLogger.info("Initial session ignored - password reset in progress")
                     }
 
                 default:
@@ -100,7 +115,7 @@ class AuthManager: ObservableObject {
                 password: password
             )
 
-            print("✅ Auth user created for: \(email)")
+            DebugLogger.success("Auth user created for: \(email)")
 
             // Step 2: Create customer profile in customers table
             if let session = response.session {
@@ -114,9 +129,9 @@ class AuthManager: ObservableObject {
                         lastName: nil,
                         phoneNumber: nil
                     )
-                    print("✅ Customer profile created in customers table")
+                    DebugLogger.success("Customer profile created in customers table")
                 } catch {
-                    print("⚠️ Auth user created but customer profile failed: \(error)")
+                    DebugLogger.warning("Auth user created but customer profile failed: \(error)")
                     // Continue anyway - the user is authenticated
                     // The profile can be created later or fixed manually
                 }
@@ -129,7 +144,7 @@ class AuthManager: ObservableObject {
             }
         } catch {
             errorMessage = "Sign up failed: \(error.localizedDescription)"
-            print("❌ Sign up error: \(error)")
+            DebugLogger.error("Sign up error", error)
             return false
         }
     }
@@ -146,6 +161,37 @@ class AuthManager: ObservableObject {
             return false
         }
 
+        // SECURITY: Check if account is locked (rate limiting)
+        do {
+            let lockoutResult: [LockoutCheckResponse] = try await supabase
+                .rpc("check_account_lockout", params: ["p_email": email])
+                .execute()
+                .value
+
+            if let lockout = lockoutResult.first, lockout.isLocked {
+                if let lockoutUntil = lockout.lockoutUntil {
+                    let formatter = ISO8601DateFormatter()
+                    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                    if let lockoutDate = formatter.date(from: lockoutUntil) {
+                        let minutesRemaining = Int(ceil(lockoutDate.timeIntervalSinceNow / 60))
+                        if minutesRemaining > 0 {
+                            errorMessage = "Account temporarily locked. Try again in \(minutesRemaining) minute\(minutesRemaining != 1 ? "s" : "")."
+                            return false
+                        }
+                    }
+                }
+                errorMessage = "Account temporarily locked. Please try again later."
+                return false
+            }
+        } catch {
+            // SECURITY: Fail closed - if rate limiting check fails, block login
+            DebugLogger.error("Rate limiting check failed", error)
+            errorMessage = "Unable to verify account status. Please try again."
+            return false
+        }
+
+        // Attempt sign in
+        var signInSuccess = false
         do {
             _ = try await supabase.auth.signIn(
                 email: email,
@@ -153,13 +199,40 @@ class AuthManager: ObservableObject {
             )
 
             isAuthenticated = true
-            print("✅ Sign in successful for: \(email)")
-            return true
+            signInSuccess = true
+            DebugLogger.success("Sign in successful for: \(email)")
         } catch {
             errorMessage = "Invalid email or password"
-            print("❌ Sign in error: \(error)")
-            return false
+            DebugLogger.error("Sign in error", error)
         }
+
+        // SECURITY: Record login attempt (non-blocking)
+        do {
+            try await supabase
+                .rpc("record_login_attempt", params: LoginAttemptParams(p_email: email, p_success: signInSuccess))
+                .execute()
+        } catch {
+            DebugLogger.error("Failed to record login attempt", error)
+        }
+
+        return signInSuccess
+    }
+
+    // Helper struct for lockout check response
+    private struct LockoutCheckResponse: Codable {
+        let isLocked: Bool
+        let lockoutUntil: String?
+
+        enum CodingKeys: String, CodingKey {
+            case isLocked = "is_locked"
+            case lockoutUntil = "lockout_until"
+        }
+    }
+
+    // Helper struct for login attempt recording (nonisolated for Sendable)
+    private nonisolated struct LoginAttemptParams: Encodable, Sendable {
+        let p_email: String
+        let p_success: Bool
     }
 
     // MARK: - Password Reset (OTP Flow)
@@ -176,21 +249,25 @@ class AuthManager: ObservableObject {
 
         // Send OTP code for password recovery (no redirect URL = OTP mode)
         try await supabase.auth.resetPasswordForEmail(email)
-        print("✅ Password reset OTP sent to: \(email)")
+        DebugLogger.success("Password reset OTP sent to: \(email)")
     }
 
     /// Verify the OTP code for password reset
+    /// Note: We set isResettingPassword flag to prevent auto-navigation during this flow
     func verifyPasswordResetOTP(email: String, token: String) async throws {
+        // Set flag to prevent auth state listener from navigating away
+        isResettingPassword = true
+
         do {
             try await supabase.auth.verifyOTP(
                 email: email,
                 token: token,
                 type: .recovery
             )
-            print("✅ OTP verified successfully")
-            isAuthenticated = true
+            DebugLogger.success("OTP verified successfully - proceeding to password reset")
         } catch {
-            print("❌ OTP verification error: \(error)")
+            isResettingPassword = false
+            DebugLogger.error("OTP verification error", error)
             throw NSError(domain: "AuthManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid or expired code"])
         }
     }
@@ -210,7 +287,7 @@ class AuthManager: ObservableObject {
             email,
             redirectTo: URL(string: "https://knockbites.com/reset-password")
         )
-        print("✅ Password reset email sent to: \(email)")
+        DebugLogger.success("Password reset email sent to: \(email)")
     }
 
     // MARK: - Update Password
@@ -222,9 +299,20 @@ class AuthManager: ObservableObject {
 
         do {
             try await supabase.auth.update(user: .init(password: newPassword))
-            print("✅ Password updated successfully")
+            DebugLogger.success("Password updated successfully")
+
+            // Clear the password reset flag
+            isResettingPassword = false
+
+            // SECURITY: Sign out after password reset so user must log in with new password
+            // This matches iOS Business behavior and ensures session is properly invalidated
+            try await supabase.auth.signOut()
+            isAuthenticated = false
+            currentUser = nil
+            DebugLogger.success("Signed out after password reset - please log in with new password")
         } catch {
-            print("❌ Password update error: \(error)")
+            isResettingPassword = false
+            DebugLogger.error("Password update error", error)
             throw NSError(domain: "AuthManager", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to update password. Please try again."])
         }
     }
@@ -232,7 +320,7 @@ class AuthManager: ObservableObject {
     // MARK: - Handle Deep Link
 
     func handleDeepLink(url: URL) async -> Bool {
-        print("🔗 Handling deep link: \(url)")
+        DebugLogger.log("DeepLink", "Handling deep link: \(url)")
 
         // Extract tokens from URL query parameters
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
@@ -266,28 +354,28 @@ class AuthManager: ObservableObject {
             }
         }
 
-        print("   Access token: \(accessToken != nil ? "found" : "not found")")
-        print("   Refresh token: \(refreshToken != nil ? "found" : "not found")")
+        DebugLogger.log("DeepLink", "Access token: \(accessToken != nil ? "found" : "not found")")
+        DebugLogger.log("DeepLink", "Refresh token: \(refreshToken != nil ? "found" : "not found")")
 
         // If we have tokens, set the session manually
         if let accessToken = accessToken {
             do {
                 try await supabase.auth.setSession(accessToken: accessToken, refreshToken: refreshToken ?? "")
-                print("✅ Session set from tokens")
+                DebugLogger.success("Session set from tokens")
                 isAuthenticated = true
                 return true
             } catch {
-                print("❌ Failed to set session: \(error)")
+                DebugLogger.error("Failed to set session", error)
             }
         }
 
         // Fallback: try Supabase's built-in URL handling
         do {
             _ = try await supabase.auth.session(from: url)
-            print("✅ Session restored from deep link URL")
+            DebugLogger.success("Session restored from deep link URL")
             return true
         } catch {
-            print("❌ Deep link handling error: \(error)")
+            DebugLogger.error("Deep link handling error", error)
             return false
         }
     }
@@ -302,10 +390,10 @@ class AuthManager: ObservableObject {
             try await supabase.auth.signOut()
             isAuthenticated = false
             currentUser = nil
-            print("✅ User signed out successfully")
+            DebugLogger.success("User signed out successfully")
         } catch {
             errorMessage = "Failed to sign out: \(error.localizedDescription)"
-            print("❌ Sign out error: \(error)")
+            DebugLogger.error("Sign out error", error)
         }
     }
 

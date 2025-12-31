@@ -65,7 +65,7 @@ class DashboardViewModel: ObservableObject {
 
             do {
                 // Use Jay's Deli store ID by default
-                let targetStoreId = storeId.flatMap { Int($0) } ?? SupabaseConfig.storeId
+                let targetStoreId = storeId.flatMap { Int($0) } ?? SecureSupabaseConfig.storeId
 
                 // Fetch orders from Supabase
                 let newOrders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)
@@ -94,7 +94,7 @@ class DashboardViewModel: ObservableObject {
 
                 // Fallback to mock data for testing
                 print("⚠️ Using mock data as fallback")
-                orders = MockDataService.shared.generateMockOrders(storeId: storeId ?? String(SupabaseConfig.storeId))
+                orders = MockDataService.shared.generateMockOrders(storeId: storeId ?? String(SecureSupabaseConfig.storeId))
             }
 
             isLoading = false
@@ -184,7 +184,7 @@ class DashboardViewModel: ObservableObject {
         realtimeTask?.cancel()
 
         // Use Jay's Deli store ID by default
-        let targetStoreId = storeId.flatMap { Int($0) } ?? SupabaseConfig.storeId
+        let targetStoreId = storeId.flatMap { Int($0) } ?? SecureSupabaseConfig.storeId
 
         // Subscribe to real-time order updates
         realtimeTask = SupabaseManager.shared.subscribeToOrders(storeId: targetStoreId) { [weak self] in
@@ -241,7 +241,7 @@ class DashboardViewModel: ObservableObject {
 
         do {
             // Use Jay's Deli store ID by default
-            let targetStoreId = storeId.flatMap { Int($0) } ?? SupabaseConfig.storeId
+            let targetStoreId = storeId.flatMap { Int($0) } ?? SecureSupabaseConfig.storeId
 
             // Fetch orders from Supabase
             orders = try await SupabaseManager.shared.fetchOrders(storeId: targetStoreId)

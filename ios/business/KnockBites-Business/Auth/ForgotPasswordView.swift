@@ -1,8 +1,8 @@
 //
 //  ForgotPasswordView.swift
-//  knockbites-customer-app
+//  KnockBites-Business
 //
-//  Created by Claude Code on 11/12/25.
+//  Created by Claude Code on 12/31/25.
 //
 
 import SwiftUI
@@ -34,7 +34,16 @@ struct ForgotPasswordView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color.background.ignoresSafeArea()
+                // Background gradient (matching StaffLoginView)
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.brandPrimary.opacity(0.1),
+                        Color.surface
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: Spacing.xl) {
@@ -70,9 +79,6 @@ struct ForgotPasswordView: View {
                         Spacer()
                     }
                 }
-                .onTapGesture {
-                    hideKeyboard()
-                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -87,7 +93,6 @@ struct ForgotPasswordView: View {
                 if authManager.isResettingPassword {
                     authManager.isResettingPassword = false
                     // Sign out to clear the session created during OTP verification
-                    // This prevents accidental authentication without completing password reset
                     Task {
                         await authManager.signOut()
                         DebugLogger.info("Signed out - password reset was not completed")
@@ -131,49 +136,63 @@ struct ForgotPasswordView: View {
     var emailStepView: some View {
         VStack(spacing: Spacing.lg) {
             // Email Form
-            VStack(spacing: Spacing.lg) {
-                VStack(alignment: .leading, spacing: Spacing.sm) {
-                    Text("Email")
-                        .font(AppFonts.subheadline)
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                Text("Email")
+                    .font(AppFonts.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.textSecondary)
+
+                HStack {
+                    Image(systemName: "envelope.fill")
                         .foregroundColor(.textSecondary)
+                        .frame(width: 20)
 
-                    HStack {
-                        Image(systemName: "envelope.fill")
-                            .foregroundColor(.textSecondary)
-
-                        TextField("you@example.com", text: $email)
-                            .textContentType(.emailAddress)
-                            .autocapitalization(.none)
-                            .keyboardType(.emailAddress)
-                    }
-                    .padding()
-                    .background(Color.surface)
-                    .cornerRadius(CornerRadius.md)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.md)
-                            .stroke(Color.border, lineWidth: 1)
-                    )
+                    TextField("you@example.com", text: $email)
+                        .textContentType(.emailAddress)
+                        .autocapitalization(.none)
+                        .keyboardType(.emailAddress)
                 }
+                .padding()
+                .background(Color.surfaceSecondary)
+                .cornerRadius(CornerRadius.md)
             }
             .padding(.horizontal, Spacing.xl)
 
             // Error Message
             if let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .font(AppFonts.subheadline)
-                    .foregroundColor(.error)
-                    .padding(.horizontal, Spacing.xl)
+                HStack(spacing: Spacing.sm) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                    Text(errorMessage)
+                        .font(AppFonts.caption)
+                }
+                .foregroundColor(.error)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.error.opacity(0.1))
+                .cornerRadius(CornerRadius.sm)
+                .padding(.horizontal, Spacing.xl)
             }
 
             // Send Code Button
-            CustomButton(
-                title: "Send Reset Code",
-                action: { Task { await handleSendCode() } },
-                style: .primary,
-                isLoading: isLoading,
-                isDisabled: email.isEmpty,
-                icon: "paperplane.fill"
-            )
+            Button(action: { Task { await handleSendCode() } }) {
+                HStack(spacing: Spacing.sm) {
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Image(systemName: "paperplane.fill")
+                        Text("Send Reset Code")
+                    }
+                }
+                .font(AppFonts.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(email.isEmpty ? Color.textSecondary.opacity(0.5) : Color.brandPrimary)
+                .cornerRadius(CornerRadius.md)
+            }
+            .disabled(email.isEmpty || isLoading)
             .padding(.horizontal, Spacing.xl)
 
             // I already have a code
@@ -205,11 +224,13 @@ struct ForgotPasswordView: View {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Verification Code")
                     .font(AppFonts.subheadline)
+                    .fontWeight(.medium)
                     .foregroundColor(.textSecondary)
 
                 HStack {
                     Image(systemName: "number")
                         .foregroundColor(.textSecondary)
+                        .frame(width: 20)
 
                     TextField("00000000", text: $otpCode)
                         .keyboardType(.numberPad)
@@ -226,32 +247,46 @@ struct ForgotPasswordView: View {
                         }
                 }
                 .padding()
-                .background(Color.surface)
+                .background(Color.surfaceSecondary)
                 .cornerRadius(CornerRadius.md)
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.md)
-                        .stroke(Color.border, lineWidth: 1)
-                )
             }
             .padding(.horizontal, Spacing.xl)
 
             // Error Message
             if let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .font(AppFonts.subheadline)
-                    .foregroundColor(.error)
-                    .padding(.horizontal, Spacing.xl)
+                HStack(spacing: Spacing.sm) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                    Text(errorMessage)
+                        .font(AppFonts.caption)
+                }
+                .foregroundColor(.error)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.error.opacity(0.1))
+                .cornerRadius(CornerRadius.sm)
+                .padding(.horizontal, Spacing.xl)
             }
 
             // Verify Button
-            CustomButton(
-                title: "Verify Code",
-                action: { Task { await handleVerifyOTP() } },
-                style: .primary,
-                isLoading: isLoading,
-                isDisabled: otpCode.count != 8,
-                icon: "checkmark.shield.fill"
-            )
+            Button(action: { Task { await handleVerifyOTP() } }) {
+                HStack(spacing: Spacing.sm) {
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Image(systemName: "checkmark.shield.fill")
+                        Text("Verify Code")
+                    }
+                }
+                .font(AppFonts.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(otpCode.count != 8 ? Color.textSecondary.opacity(0.5) : Color.brandPrimary)
+                .cornerRadius(CornerRadius.md)
+            }
+            .disabled(otpCode.count != 8 || isLoading)
             .padding(.horizontal, Spacing.xl)
 
             // Resend Code with rate limiting
@@ -286,11 +321,13 @@ struct ForgotPasswordView: View {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("New Password")
                     .font(AppFonts.subheadline)
+                    .fontWeight(.medium)
                     .foregroundColor(.textSecondary)
 
                 HStack {
                     Image(systemName: "lock.fill")
                         .foregroundColor(.textSecondary)
+                        .frame(width: 20)
 
                     if showPassword {
                         TextField("Enter new password", text: $newPassword)
@@ -304,12 +341,8 @@ struct ForgotPasswordView: View {
                     }
                 }
                 .padding()
-                .background(Color.surface)
+                .background(Color.surfaceSecondary)
                 .cornerRadius(CornerRadius.md)
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.md)
-                        .stroke(Color.border, lineWidth: 1)
-                )
             }
             .padding(.horizontal, Spacing.xl)
 
@@ -317,11 +350,13 @@ struct ForgotPasswordView: View {
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Confirm Password")
                     .font(AppFonts.subheadline)
+                    .fontWeight(.medium)
                     .foregroundColor(.textSecondary)
 
                 HStack {
                     Image(systemName: "lock.fill")
                         .foregroundColor(.textSecondary)
+                        .frame(width: 20)
 
                     if showPassword {
                         TextField("Confirm new password", text: $confirmPassword)
@@ -330,11 +365,11 @@ struct ForgotPasswordView: View {
                     }
                 }
                 .padding()
-                .background(Color.surface)
+                .background(Color.surfaceSecondary)
                 .cornerRadius(CornerRadius.md)
                 .overlay(
                     RoundedRectangle(cornerRadius: CornerRadius.md)
-                        .stroke(passwordsMatch ? Color.border : Color.error, lineWidth: 1)
+                        .stroke(!confirmPassword.isEmpty && !passwordsMatch ? Color.error : Color.clear, lineWidth: 1)
                 )
 
                 if !confirmPassword.isEmpty && !passwordsMatch {
@@ -351,30 +386,53 @@ struct ForgotPasswordView: View {
                     .font(AppFonts.caption)
                     .foregroundColor(.textSecondary)
 
-                PasswordRequirementRow(
-                    text: "Be at least 8 characters",
-                    isMet: newPassword.count >= 8
-                )
+                HStack(spacing: Spacing.sm) {
+                    Image(systemName: newPassword.count >= 8 ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 12))
+                        .foregroundColor(newPassword.count >= 8 ? .success : .textSecondary)
+
+                    Text("Be at least 8 characters")
+                        .font(AppFonts.caption)
+                        .foregroundColor(newPassword.count >= 8 ? .success : .textSecondary)
+                }
             }
             .padding(.horizontal, Spacing.xl)
 
             // Error Message
             if let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .font(AppFonts.subheadline)
-                    .foregroundColor(.error)
-                    .padding(.horizontal, Spacing.xl)
+                HStack(spacing: Spacing.sm) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                    Text(errorMessage)
+                        .font(AppFonts.caption)
+                }
+                .foregroundColor(.error)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.error.opacity(0.1))
+                .cornerRadius(CornerRadius.sm)
+                .padding(.horizontal, Spacing.xl)
             }
 
             // Update Password Button
-            CustomButton(
-                title: "Update Password",
-                action: { Task { await handleUpdatePassword() } },
-                style: .primary,
-                isLoading: isLoading,
-                isDisabled: !isPasswordFormValid,
-                icon: "checkmark.shield.fill"
-            )
+            Button(action: { Task { await handleUpdatePassword() } }) {
+                HStack(spacing: Spacing.sm) {
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Image(systemName: "checkmark.shield.fill")
+                        Text("Update Password")
+                    }
+                }
+                .font(AppFonts.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(!isPasswordFormValid ? Color.textSecondary.opacity(0.5) : Color.brandPrimary)
+                .cornerRadius(CornerRadius.md)
+            }
+            .disabled(!isPasswordFormValid || isLoading)
             .padding(.horizontal, Spacing.xl)
         }
     }
@@ -402,11 +460,19 @@ struct ForgotPasswordView: View {
             .cornerRadius(CornerRadius.lg)
             .padding(.horizontal, Spacing.xl)
 
-            CustomButton(
-                title: "Back to Login",
-                action: { dismiss() },
-                style: .primary
-            )
+            Button(action: { dismiss() }) {
+                HStack(spacing: Spacing.sm) {
+                    Image(systemName: "person.badge.key.fill")
+                    Text("Back to Login")
+                }
+                .font(AppFonts.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.brandPrimary)
+                .cornerRadius(CornerRadius.md)
+            }
             .padding(.horizontal, Spacing.xl)
         }
     }
@@ -510,24 +576,6 @@ struct ForgotPasswordView: View {
         }
 
         isLoading = false
-    }
-}
-
-// MARK: - Password Requirement Row
-struct PasswordRequirementRow: View {
-    let text: String
-    let isMet: Bool
-
-    var body: some View {
-        HStack(spacing: Spacing.sm) {
-            Image(systemName: isMet ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 12))
-                .foregroundColor(isMet ? .success : .textSecondary)
-
-            Text(text)
-                .font(AppFonts.caption)
-                .foregroundColor(isMet ? .success : .textSecondary)
-        }
     }
 }
 

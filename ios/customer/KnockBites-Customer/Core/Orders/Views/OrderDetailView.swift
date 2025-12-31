@@ -404,6 +404,7 @@ struct OrderDetailItemRow: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let mockOrder = Order(
         id: "order_1",
@@ -439,3 +440,4 @@ struct OrderDetailItemRow: View {
     return OrderDetailView(order: mockOrder)
         .environmentObject(CartViewModel())
 }
+#endif

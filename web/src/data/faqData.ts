@@ -103,7 +103,7 @@ export const faqData: FAQItem[] = [
     category: "Account",
     question: "How do I reset my password?",
     answer:
-      "Click the 'Forgot Password' link on the sign-in page. Enter your email address, and we'll send you a link to reset your password.",
+      "Click the 'Forgot Password' link on the sign-in page. Enter your email address, and we'll send you an 8-digit verification code to reset your password.",
   },
   {
     id: 13,

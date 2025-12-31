@@ -636,6 +636,7 @@ struct OrderConfirmationView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let cartViewModel = CartViewModel()
     let mockItems = MockDataService.shared.getMenuItems()
@@ -650,3 +651,4 @@ struct OrderConfirmationView: View {
     return CheckoutView()
         .environmentObject(cartViewModel)
 }
+#endif

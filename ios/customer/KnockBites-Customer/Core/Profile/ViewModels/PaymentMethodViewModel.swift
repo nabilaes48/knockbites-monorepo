@@ -4,6 +4,9 @@
 //
 //  Created by Claude Code on 11/12/25.
 //
+//  SECURITY FIX: Migrated from UserDefaults to Keychain for secure storage
+//  CVE-2025-KB003: Payment card data must be stored in encrypted Keychain
+//
 
 import SwiftUI
 import Combine
@@ -13,29 +16,34 @@ class PaymentMethodViewModel: ObservableObject {
     @Published var paymentMethods: [PaymentMethod] = []
     @Published var isLoading = false
 
-    private let paymentMethodsKey = "savedPaymentMethods"
+    // SECURITY: Using Keychain key instead of UserDefaults key
+    private let keychainKey = "secure.paymentMethods.v2"
+    private let keychain = KeychainHelper.shared
 
     init() {
         loadPaymentMethods()
 
-        // Add some mock payment methods if none exist
+        // Add some mock payment methods if none exist (for demo purposes)
         if paymentMethods.isEmpty {
             addMockPaymentMethods()
         }
     }
 
-    // MARK: - Load/Save
+    // MARK: - Load/Save (SECURE: Using Keychain)
 
     private func loadPaymentMethods() {
-        if let data = UserDefaults.standard.data(forKey: paymentMethodsKey),
-           let methods = try? JSONDecoder().decode([PaymentMethod].self, from: data) {
+        // SECURITY: Load from Keychain instead of UserDefaults
+        if let methods: [PaymentMethod] = keychain.read(forKey: keychainKey, as: [PaymentMethod].self) {
             paymentMethods = methods
         }
     }
 
     private func savePaymentMethods() {
-        if let encoded = try? JSONEncoder().encode(paymentMethods) {
-            UserDefaults.standard.set(encoded, forKey: paymentMethodsKey)
+        // SECURITY: Save to Keychain instead of UserDefaults
+        do {
+            try keychain.save(paymentMethods, forKey: keychainKey)
+        } catch {
+            DebugLogger.error("Failed to save payment methods to Keychain", error)
         }
     }
 
@@ -153,6 +161,7 @@ class PaymentMethodViewModel: ObservableObject {
 
     func clearAll() {
         paymentMethods.removeAll()
-        UserDefaults.standard.removeObject(forKey: paymentMethodsKey)
+        // SECURITY: Clear from Keychain instead of UserDefaults
+        keychain.delete(forKey: keychainKey)
     }
 }
