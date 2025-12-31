@@ -172,20 +172,7 @@ struct MoreQuickActionCard: View {
     private var destinationView: some View {
         switch action {
         case .team:
-            // TODO: Implement TeamView and replace this placeholder
-            VStack(spacing: Spacing.lg) {
-                Image(systemName: "person.3.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(.textSecondary)
-                Text("Team Management")
-                    .font(AppFonts.title2)
-                    .fontWeight(.bold)
-                Text("Coming Soon")
-                    .font(AppFonts.subheadline)
-                    .foregroundColor(.textSecondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("Team")
+            StaffManagementView()
         case .storeInfo:
             StoreAnalyticsView()
         case .notifications:

@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct KnockBitesBusinessApp: App {
     @ObservedObject private var authManager = AuthManager.shared
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         // Test Supabase connection on app launch
@@ -38,8 +39,38 @@ struct KnockBitesBusinessApp: App {
                 // Check auth status on app launch
                 await authManager.checkAuthStatus()
             }
+            .onChange(of: scenePhase) { _, newPhase in
+                handleScenePhaseChange(newPhase)
+            }
         }
     }
+
+    // MARK: - App Lifecycle Handling
+
+    private func handleScenePhaseChange(_ phase: ScenePhase) {
+        switch phase {
+        case .active:
+            // App became active - refresh data
+            DebugLogger.info("App became active - refreshing data")
+            NotificationCenter.default.post(name: .appBecameActive, object: nil)
+
+        case .inactive:
+            DebugLogger.info("App became inactive")
+
+        case .background:
+            DebugLogger.info("App entered background")
+
+        @unknown default:
+            break
+        }
+    }
+}
+
+// MARK: - Notification Names
+extension Notification.Name {
+    static let appBecameActive = Notification.Name("appBecameActive")
+    static let orderReceived = Notification.Name("orderReceived")
+    static let orderStatusChanged = Notification.Name("orderStatusChanged")
 }
 
 // MARK: - Loading Screen

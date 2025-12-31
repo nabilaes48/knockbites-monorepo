@@ -18,6 +18,7 @@ class DashboardViewModel: ObservableObject {
 
     private var realtimeTask: Task<Void, Never>?
     private var refreshTimer: Timer?
+    private var appBecameActiveObserver: NSObjectProtocol?
 
     // Track order IDs for new order detection
     private var knownOrderIds: Set<String> = []
@@ -27,9 +28,30 @@ class DashboardViewModel: ObservableObject {
 
     init() {
         startAutoRefresh()
+        setupAppLifecycleObservers()
+    }
+
+    // MARK: - App Lifecycle
+
+    private func setupAppLifecycleObservers() {
+        appBecameActiveObserver = NotificationCenter.default.addObserver(
+            forName: .appBecameActive,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                print("📱 App became active - refreshing orders")
+                self.refresh()
+            }
+        }
     }
 
     nonisolated deinit {
+        // Remove observer on deinit
+        if let observer = appBecameActiveObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
         Task { @MainActor in
             stopAutoRefresh()
             stopRealtimeUpdates()
