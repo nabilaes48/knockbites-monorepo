@@ -143,7 +143,38 @@ struct MenuItemRow: View {
     @FocusState private var isPriceFocused: Bool
 
     var body: some View {
-        HStack {
+        HStack(spacing: Spacing.md) {
+            // Menu Item Image
+            AsyncImage(url: URL(string: item.imageURL)) { phase in
+                switch phase {
+                case .empty:
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.gray.opacity(0.2))
+                        .overlay(
+                            ProgressView()
+                                .scaleEffect(0.7)
+                        )
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .clipped()
+                case .failure:
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.brandPrimary.opacity(0.1))
+                        .overlay(
+                            Image(systemName: "fork.knife")
+                                .font(.system(size: 20))
+                                .foregroundColor(.brandPrimary.opacity(0.5))
+                        )
+                @unknown default:
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.gray.opacity(0.2))
+                }
+            }
+            .frame(width: 60, height: 60)
+            .cornerRadius(8)
+
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 Text(item.name)
                     .font(AppFonts.body)

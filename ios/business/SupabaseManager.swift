@@ -510,7 +510,7 @@ class SupabaseManager {
                 description: item.description,
                 price: item.price,
                 categoryId: String(item.category_id),
-                imageURL: item.image_url ?? "",
+                imageURL: SecureSupabaseConfig.imageURL(from: item.image_url),
                 isAvailable: item.is_available,
                 dietaryInfo: [],
                 customizationGroups: [],
