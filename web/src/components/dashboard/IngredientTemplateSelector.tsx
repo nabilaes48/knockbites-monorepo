@@ -38,25 +38,25 @@ const categoryConfig = {
   extras: {
     label: "Premium Extras",
     icon: Sparkles,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-    borderColor: "border-purple-200",
+    color: "text-purple-600 dark:text-purple-400",
+    bgColor: "bg-purple-50 dark:bg-purple-950/30",
+    borderColor: "border-purple-200 dark:border-purple-800",
     description: "Charged ingredients - customers pay extra",
   },
   sauces: {
     label: "Signature Sauces",
     icon: Droplet,
-    color: "text-amber-600",
-    bgColor: "bg-amber-50",
-    borderColor: "border-amber-200",
+    color: "text-amber-600 dark:text-amber-400",
+    bgColor: "bg-amber-50 dark:bg-amber-950/30",
+    borderColor: "border-amber-200 dark:border-amber-800",
     description: "Standard ingredients - typically free",
   },
   vegetables: {
     label: "Fresh Vegetables",
     icon: Salad,
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-    borderColor: "border-green-200",
+    color: "text-green-600 dark:text-green-400",
+    bgColor: "bg-green-50 dark:bg-green-950/30",
+    borderColor: "border-green-200 dark:border-green-800",
     description: "Standard ingredients - typically free",
   },
 };
@@ -206,17 +206,17 @@ export const IngredientTemplateSelector = ({
                             </div>
                           </TableCell>
                           <TableCell className="text-center py-2">
-                            <span className={template.portion_pricing.light > 0 ? "text-green-600 font-medium" : "text-muted-foreground text-xs"}>
+                            <span className={template.portion_pricing.light > 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-muted-foreground text-xs"}>
                               {formatPrice(template.portion_pricing.light)}
                             </span>
                           </TableCell>
                           <TableCell className="text-center py-2">
-                            <span className={template.portion_pricing.regular > 0 ? "text-green-600 font-medium" : "text-muted-foreground text-xs"}>
+                            <span className={template.portion_pricing.regular > 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-muted-foreground text-xs"}>
                               {formatPrice(template.portion_pricing.regular)}
                             </span>
                           </TableCell>
                           <TableCell className="text-center py-2">
-                            <span className={template.portion_pricing.extra > 0 ? "text-green-600 font-medium" : "text-muted-foreground text-xs"}>
+                            <span className={template.portion_pricing.extra > 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-muted-foreground text-xs"}>
                               {formatPrice(template.portion_pricing.extra)}
                             </span>
                           </TableCell>

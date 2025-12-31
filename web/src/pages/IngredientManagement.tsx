@@ -65,23 +65,23 @@ const categoryConfig = {
   vegetables: {
     label: "Fresh Vegetables",
     icon: Salad,
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-    borderColor: "border-green-200",
+    color: "text-green-600 dark:text-green-400",
+    bgColor: "bg-green-50 dark:bg-green-950/30",
+    borderColor: "border-green-200 dark:border-green-800",
   },
   sauces: {
     label: "Signature Sauces",
     icon: Droplet,
-    color: "text-amber-600",
-    bgColor: "bg-amber-50",
-    borderColor: "border-amber-200",
+    color: "text-amber-600 dark:text-amber-400",
+    bgColor: "bg-amber-50 dark:bg-amber-950/30",
+    borderColor: "border-amber-200 dark:border-amber-800",
   },
   extras: {
     label: "Premium Extras",
     icon: Sparkles,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-    borderColor: "border-purple-200",
+    color: "text-purple-600 dark:text-purple-400",
+    bgColor: "bg-purple-50 dark:bg-purple-950/30",
+    borderColor: "border-purple-200 dark:border-purple-800",
   },
 };
 
@@ -479,7 +479,7 @@ const IngredientManagement = () => {
                             ) : (
                               <button
                                 onClick={() => startEditingPrice(ing.id, "light", ing.portion_pricing.light)}
-                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.light > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.light > 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-muted-foreground"}`}
                               >
                                 {formatPrice(ing.portion_pricing.light)}
                               </button>
@@ -504,7 +504,7 @@ const IngredientManagement = () => {
                             ) : (
                               <button
                                 onClick={() => startEditingPrice(ing.id, "regular", ing.portion_pricing.regular)}
-                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.regular > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.regular > 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-muted-foreground"}`}
                               >
                                 {formatPrice(ing.portion_pricing.regular)}
                               </button>
@@ -529,7 +529,7 @@ const IngredientManagement = () => {
                             ) : (
                               <button
                                 onClick={() => startEditingPrice(ing.id, "extra", ing.portion_pricing.extra)}
-                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.extra > 0 ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                                className={`px-2 py-1 rounded hover:bg-muted transition-colors cursor-pointer ${ing.portion_pricing.extra > 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-muted-foreground"}`}
                               >
                                 {formatPrice(ing.portion_pricing.extra)}
                               </button>
