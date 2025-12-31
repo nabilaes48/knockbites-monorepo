@@ -15,7 +15,8 @@ struct ReceiptService {
     // MARK: - Receipt Template
 
     /// Generates a formatted receipt string for thermal printer (80mm paper)
-    static func generateReceipt(order: Order, store: Store, settings: ReceiptSettings? = nil) -> String {
+    /// Enhanced with welcome message, customer ID, and coupon support
+    static func generateReceipt(order: Order, store: Store, settings: ReceiptSettings? = nil, couponCode: String? = nil, couponDiscount: Double? = nil) -> String {
         let receiptSettings = settings ?? ReceiptSettings.current
         var receipt = ""
 
@@ -34,10 +35,53 @@ struct ReceiptService {
         // ORDER INFORMATION
         // ========================================
         receipt += "\n"
-        receipt += "Order #: \(order.orderNumber)\n"
+        receipt += boldText("ORDER #\(order.orderNumber)")
+        receipt += "\n"
         receipt += "Date: \(formatDate(order.createdAt))\n"
         receipt += "Time: \(formatTime(order.createdAt))\n"
+        receipt += separator()
+
+        // ========================================
+        // WELCOME MESSAGE
+        // ========================================
+        receipt += "\n"
+        let firstName = order.customerName.components(separatedBy: " ").first ?? order.customerName
+        let isRepeatCustomer = order.isRepeatCustomer ?? false
+
+        if isRepeatCustomer {
+            receipt += centerText("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", width: 48)
+            receipt += "\n"
+            receipt += centerText("Welcome back, \(firstName)!", width: 48)
+            receipt += "\n"
+            receipt += centerText("We're delighted to serve you again.", width: 48)
+            receipt += "\n"
+            receipt += centerText("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", width: 48)
+        } else {
+            receipt += centerText("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", width: 48)
+            receipt += "\n"
+            receipt += centerText("Welcome, \(firstName)!", width: 48)
+            receipt += "\n"
+            receipt += centerText("Thank you for choosing \(store.name).", width: 48)
+            receipt += "\n"
+            receipt += centerText("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", width: 48)
+        }
+        receipt += "\n"
+
+        // ========================================
+        // CUSTOMER INFORMATION
+        // ========================================
+        receipt += "\n"
         receipt += "Customer: \(order.customerName)\n"
+
+        // Customer ID (first 8 chars of UUID)
+        if let customerId = order.customerId, !customerId.isEmpty {
+            let shortId = String(customerId.prefix(8)).uppercased()
+            receipt += "Customer ID: \(shortId)\n"
+        }
+
+        if let phone = order.customerPhone, !phone.isEmpty {
+            receipt += "Phone: \(phone)\n"
+        }
 
         receipt += separator()
 
@@ -88,6 +132,32 @@ struct ReceiptService {
         receipt += boldText(formatPriceLine("TOTAL:", price: total))
         receipt += boldLine()
         receipt += "\n"
+
+        // ========================================
+        // COUPON (if available)
+        // ========================================
+        if let code = couponCode, !code.isEmpty {
+            receipt += "\n"
+            receipt += centerText("┌────────────────────────────────┐", width: 48)
+            receipt += "\n"
+            receipt += centerText("│    🎉 SPECIAL OFFER 🎉         │", width: 48)
+            receipt += "\n"
+            receipt += centerText("├────────────────────────────────┤", width: 48)
+            receipt += "\n"
+            receipt += centerText("│  Use code: \(code.padding(toLength: 18, withPad: " ", startingAt: 0)) │", width: 48)
+            receipt += "\n"
+
+            if let discount = couponDiscount {
+                let discountText = String(format: "Save $%.2f on next order!", discount)
+                receipt += centerText("│  \(discountText.padding(toLength: 30, withPad: " ", startingAt: 0))│", width: 48)
+            } else {
+                receipt += centerText("│  Save 10% on your next order! │", width: 48)
+            }
+            receipt += "\n"
+            receipt += centerText("└────────────────────────────────┘", width: 48)
+            receipt += "\n"
+            receipt += separator()
+        }
 
         // ========================================
         // MARKETING CONTENT (Based on Settings)

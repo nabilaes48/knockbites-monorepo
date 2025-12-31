@@ -182,6 +182,10 @@ struct Order: Identifiable, Codable {
     let orderNumber: String
     let userId: String
     let customerName: String
+    var customerId: String?
+    var customerPhone: String?
+    var customerEmail: String?
+    var isRepeatCustomer: Bool?
     let storeId: String
     let items: [CartItem]
     let subtotal: Double
