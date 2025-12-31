@@ -89,10 +89,11 @@ export const PortionSelectorRow = ({
   const hasPricing = pricing && (pricing.light > 0 || pricing.regular > 0 || pricing.extra > 0);
 
   return (
-    <div className="flex items-center gap-4 py-2">
-      <div className="flex-1 min-w-0">
+    <div className="flex flex-col gap-2 py-3 border-b border-muted/30 last:border-b-0">
+      {/* Row 1: Ingredient name */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <p className="font-medium truncate">{ingredientName}</p>
+          <p className="font-medium">{ingredientName}</p>
           {hasPricing && (
             <span className="text-[10px] font-bold text-purple-600 px-1.5 py-0.5 bg-purple-100 rounded">
               $
@@ -100,18 +101,19 @@ export const PortionSelectorRow = ({
           )}
         </div>
         {showPrices && pricing && pricing[value] > 0 && (
-          <p className="text-xs text-green-600 font-medium">
+          <p className="text-sm text-green-600 font-semibold">
             +${pricing[value].toFixed(2)}
           </p>
         )}
       </div>
+      {/* Row 2: Portion selector buttons */}
       <PortionSelector
         value={value}
         onChange={onChange}
         pricing={pricing}
         showPrices={showPrices}
         disabled={disabled}
-        className="flex-shrink-0"
+        className="w-full"
       />
     </div>
   );
