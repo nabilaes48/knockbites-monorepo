@@ -56,8 +56,9 @@ export function ProtectedRoute({
     return <Navigate to="/dashboard" replace />
   }
 
-  // Check if user account is active
-  if (!profile.is_active) {
+  // Check if user account is active (only for business users, not customers)
+  // Customers don't have is_active field, so we check if it exists and is false
+  if (profile.role !== 'customer' && 'is_active' in profile && !profile.is_active) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6">
