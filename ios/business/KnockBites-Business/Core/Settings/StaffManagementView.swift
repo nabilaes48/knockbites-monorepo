@@ -30,10 +30,10 @@ struct StaffManagementView: View {
                 if !viewModel.isLoading {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Spacing.md) {
-                            StatCard(title: "Total Staff", value: "\(viewModel.staff.count)", icon: "person.3.fill", color: .brandPrimary)
-                            StatCard(title: "Admins", value: "\(viewModel.adminCount)", icon: "shield.fill", color: .blue)
-                            StatCard(title: "Managers", value: "\(viewModel.managerCount)", icon: "briefcase.fill", color: .green)
-                            StatCard(title: "Active", value: "\(viewModel.activeCount)", icon: "checkmark.circle.fill", color: .orange)
+                            StaffStatCard(title: "Total Staff", value: "\(viewModel.staff.count)", icon: "person.3.fill", color: .brandPrimary)
+                            StaffStatCard(title: "Admins", value: "\(viewModel.adminCount)", icon: "shield.fill", color: .blue)
+                            StaffStatCard(title: "Managers", value: "\(viewModel.managerCount)", icon: "briefcase.fill", color: .green)
+                            StaffStatCard(title: "Active", value: "\(viewModel.activeCount)", icon: "checkmark.circle.fill", color: .orange)
                         }
                         .padding(.horizontal)
                         .padding(.vertical, Spacing.sm)
@@ -56,19 +56,19 @@ struct StaffManagementView: View {
                     // Role Filter
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Spacing.sm) {
-                            FilterChip(title: "All", isSelected: filterRole == nil) {
+                            StaffFilterChip(title: "All", isSelected: filterRole == nil) {
                                 filterRole = nil
                             }
-                            FilterChip(title: "Super Admin", isSelected: filterRole == "super_admin") {
+                            StaffFilterChip(title: "Super Admin", isSelected: filterRole == "super_admin") {
                                 filterRole = "super_admin"
                             }
-                            FilterChip(title: "Admin", isSelected: filterRole == "admin") {
+                            StaffFilterChip(title: "Admin", isSelected: filterRole == "admin") {
                                 filterRole = "admin"
                             }
-                            FilterChip(title: "Manager", isSelected: filterRole == "manager") {
+                            StaffFilterChip(title: "Manager", isSelected: filterRole == "manager") {
                                 filterRole = "manager"
                             }
-                            FilterChip(title: "Staff", isSelected: filterRole == "staff") {
+                            StaffFilterChip(title: "Staff", isSelected: filterRole == "staff") {
                                 filterRole = "staff"
                             }
                         }
@@ -350,8 +350,8 @@ struct AddStaffView: View {
     }
 }
 
-// MARK: - Helper Views
-struct StatCard: View {
+// MARK: - Helper Views (Private to avoid conflicts)
+private struct StaffStatCard: View {
     let title: String
     let value: String
     let icon: String
@@ -379,7 +379,7 @@ struct StatCard: View {
     }
 }
 
-struct FilterChip: View {
+private struct StaffFilterChip: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
