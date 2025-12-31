@@ -274,6 +274,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           full_name: fullName,
           phone: phone,
         },
+        emailRedirectTo: `${window.location.origin}/signin`,
       },
     })
     if (error) throw error
