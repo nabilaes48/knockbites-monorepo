@@ -198,6 +198,24 @@ class AuthManager: ObservableObject {
         }
     }
 
+    func signInWithGoogle() async throws {
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            try await supabase.auth.signInWithOAuth(
+                provider: .google,
+                redirectTo: URL(string: "knockbites-business://auth/callback")
+            )
+            DebugLogger.success("Google OAuth initiated")
+        } catch {
+            errorMessage = "Failed to sign in with Google: \(error.localizedDescription)"
+            DebugLogger.error("Google sign in failed", error)
+            isLoading = false
+            throw error
+        }
+    }
+
     func signOut() async {
         isLoading = true
 

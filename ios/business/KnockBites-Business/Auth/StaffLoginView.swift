@@ -33,11 +33,13 @@ struct StaffLoginView: View {
 
                 // Logo and title
                 VStack(spacing: Spacing.lg) {
-                    Image(systemName: "fork.knife.circle.fill")
-                        .font(.system(size: 80))
-                        .foregroundColor(.brandPrimary)
+                    Image("KnockBitesLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 100)
+                        .cornerRadius(20)
 
-                    Text("KnockBites Connect")
+                    Text("KnockBites")
                         .font(AppFonts.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.textPrimary)
@@ -138,6 +140,41 @@ struct StaffLoginView: View {
                     .font(AppFonts.subheadline)
                     .foregroundColor(.brandPrimary)
 
+                    // Divider
+                    HStack {
+                        Rectangle()
+                            .fill(Color.textSecondary.opacity(0.3))
+                            .frame(height: 1)
+                        Text("or")
+                            .font(AppFonts.caption)
+                            .foregroundColor(.textSecondary)
+                        Rectangle()
+                            .fill(Color.textSecondary.opacity(0.3))
+                            .frame(height: 1)
+                    }
+                    .padding(.vertical, Spacing.sm)
+
+                    // Google sign in button
+                    Button(action: handleGoogleSignIn) {
+                        HStack(spacing: Spacing.sm) {
+                            Image(systemName: "g.circle.fill")
+                                .font(.system(size: 20))
+                            Text("Continue with Google")
+                        }
+                        .font(AppFonts.headline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.textPrimary)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.surfaceSecondary)
+                        .cornerRadius(CornerRadius.md)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: CornerRadius.md)
+                                .stroke(Color.textSecondary.opacity(0.3), lineWidth: 1)
+                        )
+                    }
+                    .disabled(authManager.isLoading)
+
                     // Error message
                     if let errorMessage = authManager.errorMessage {
                         HStack(spacing: Spacing.sm) {
@@ -232,6 +269,22 @@ struct StaffLoginView: View {
         Task {
             do {
                 try await authManager.signIn(email: email, password: password)
+            } catch {
+                // Error is already set in authManager
+                showingError = true
+            }
+        }
+    }
+
+    private func handleGoogleSignIn() {
+        // Clear keyboard
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+
+        authManager.clearError()
+
+        Task {
+            do {
+                try await authManager.signInWithGoogle()
             } catch {
                 // Error is already set in authManager
                 showingError = true
