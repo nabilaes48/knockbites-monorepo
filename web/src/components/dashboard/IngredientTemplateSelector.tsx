@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/lib/supabase";
-import { Salad, Droplet, Plus, Sparkles } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { supabase } from "@/lib/supabase";
+import { Salad, Droplet, Sparkles, DollarSign } from "lucide-react";
 
 interface IngredientTemplate {
   id: number;
@@ -33,27 +35,39 @@ interface IngredientTemplateSelectorProps {
 }
 
 const categoryConfig = {
-  vegetables: {
-    label: "Fresh Vegetables",
-    icon: Salad,
-    color: "text-green-500",
-    bgColor: "bg-green-950/50",
-    borderColor: "border-green-700",
+  extras: {
+    label: "Premium Extras",
+    icon: Sparkles,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
+    borderColor: "border-purple-200",
+    description: "Charged ingredients - customers pay extra",
   },
   sauces: {
     label: "Signature Sauces",
     icon: Droplet,
-    color: "text-amber-500",
-    bgColor: "bg-amber-950/50",
-    borderColor: "border-amber-700",
+    color: "text-amber-600",
+    bgColor: "bg-amber-50",
+    borderColor: "border-amber-200",
+    description: "Standard ingredients - typically free",
   },
-  extras: {
-    label: "Premium Extras",
-    icon: Sparkles,
-    color: "text-purple-500",
-    bgColor: "bg-purple-950/50",
-    borderColor: "border-purple-700",
+  vegetables: {
+    label: "Fresh Vegetables",
+    icon: Salad,
+    color: "text-green-600",
+    bgColor: "bg-green-50",
+    borderColor: "border-green-200",
+    description: "Standard ingredients - typically free",
   },
+};
+
+const formatPrice = (price: number) => {
+  if (price === 0) return "Free";
+  return `$${price.toFixed(2)}`;
+};
+
+const hasPricing = (pricing: { none: number; light: number; regular: number; extra: number }) => {
+  return pricing.light > 0 || pricing.regular > 0 || pricing.extra > 0;
 };
 
 export const IngredientTemplateSelector = ({
@@ -113,8 +127,11 @@ export const IngredientTemplateSelector = ({
     );
   }
 
+  // Order categories: extras first, then sauces, then vegetables
+  const categoryOrder = ["extras", "sauces", "vegetables"];
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Label className="text-base font-semibold">Quick Add Ingredients</Label>
         <Badge variant="outline" className="text-xs">
@@ -122,8 +139,11 @@ export const IngredientTemplateSelector = ({
         </Badge>
       </div>
 
-      <Accordion type="multiple" className="w-full space-y-2">
-        {Object.entries(groupedTemplates).map(([category, categoryTemplates]) => {
+      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+        {categoryOrder.map((category) => {
+          const categoryTemplates = groupedTemplates[category];
+          if (!categoryTemplates?.length) return null;
+
           const config = categoryConfig[category as keyof typeof categoryConfig];
           if (!config) return null;
 
@@ -133,60 +153,83 @@ export const IngredientTemplateSelector = ({
           ).length;
 
           return (
-            <AccordionItem
-              key={category}
-              value={category}
-              className={`border-2 ${config.borderColor} ${config.bgColor} rounded-lg overflow-hidden`}
-            >
-              <AccordionTrigger className="px-4 hover:no-underline">
-                <div className="flex items-center gap-3 flex-1">
+            <Card key={category} className={`border-2 ${config.borderColor} ${config.bgColor}`}>
+              <CardHeader className="py-3 px-4">
+                <CardTitle className="flex items-center gap-2 text-base">
                   <Icon className={`h-5 w-5 ${config.color}`} />
-                  <span className="font-semibold">{config.label}</span>
-                  <Badge variant="secondary" className="ml-auto mr-2">
+                  <span className={config.color}>{config.label}</span>
+                  <Badge variant="secondary" className="ml-auto">
                     {selectedInCategory}/{categoryTemplates.length}
                   </Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="grid grid-cols-2 gap-2 pt-2">
-                  {categoryTemplates.map((template) => {
-                    const isSelected = selectedTemplates.includes(template.id);
-                    const hasPricing = Object.values(template.portion_pricing).some(
-                      (price) => price > 0
-                    );
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  {config.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-8"></TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead className="text-center w-16">Light</TableHead>
+                      <TableHead className="text-center w-16">Regular</TableHead>
+                      <TableHead className="text-center w-16">Extra</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {categoryTemplates.map((template) => {
+                      const isSelected = selectedTemplates.includes(template.id);
+                      const isPremium = hasPricing(template.portion_pricing);
 
-                    return (
-                      <div
-                        key={template.id}
-                        className="flex items-center space-x-2 p-2 border rounded hover:bg-muted/50 transition-colors"
-                      >
-                        <Checkbox
-                          id={`template-${template.id}`}
-                          checked={isSelected}
-                          onCheckedChange={() => onToggleTemplate(template.id, template)}
-                        />
-                        <Label
-                          htmlFor={`template-${template.id}`}
-                          className="flex-1 cursor-pointer text-sm"
+                      return (
+                        <TableRow
+                          key={template.id}
+                          className={`cursor-pointer hover:bg-muted/50 ${isSelected ? "bg-primary/5" : ""}`}
+                          onClick={() => onToggleTemplate(template.id, template)}
                         >
-                          <div className="flex items-center gap-2">
-                            <span>{template.name}</span>
-                            {hasPricing && (
-                              <Badge variant="outline" className="text-xs">
-                                $$
-                              </Badge>
-                            )}
-                          </div>
-                        </Label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+                          <TableCell className="py-2">
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={() => onToggleTemplate(template.id, template)}
+                            />
+                          </TableCell>
+                          <TableCell className="py-2 font-medium">
+                            <div className="flex items-center gap-2">
+                              {template.name}
+                              {isPremium && (
+                                <Badge variant="outline" className="text-xs py-0">
+                                  <DollarSign className="h-3 w-3 mr-0.5" />
+                                  Charged
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center py-2">
+                            <span className={template.portion_pricing.light > 0 ? "text-green-600 font-medium" : "text-muted-foreground text-xs"}>
+                              {formatPrice(template.portion_pricing.light)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center py-2">
+                            <span className={template.portion_pricing.regular > 0 ? "text-green-600 font-medium" : "text-muted-foreground text-xs"}>
+                              {formatPrice(template.portion_pricing.regular)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center py-2">
+                            <span className={template.portion_pricing.extra > 0 ? "text-green-600 font-medium" : "text-muted-foreground text-xs"}>
+                              {formatPrice(template.portion_pricing.extra)}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           );
         })}
-      </Accordion>
+      </div>
 
       {Object.keys(groupedTemplates).length === 0 && (
         <div className="text-center py-8 text-sm text-muted-foreground">
