@@ -1824,4 +1824,118 @@ class SupabaseManager {
         print("✅ Fetched \(response.count) portion customizations")
         return response
     }
+
+    // MARK: - Ingredient Template Management (CRUD)
+
+    /// Fetch all ingredient templates (including inactive ones for management)
+    func fetchAllIngredientTemplates() async throws -> [IngredientTemplate] {
+        print("🔄 Fetching all ingredient templates for management...")
+
+        let response: [IngredientTemplate] = try await client
+            .from("ingredient_templates")
+            .select()
+            .order("category")
+            .order("display_order")
+            .order("name")
+            .execute()
+            .value
+
+        print("✅ Fetched \(response.count) ingredient templates")
+        return response
+    }
+
+    /// Update ingredient template pricing
+    func updateIngredientTemplate(id: Int, name: String? = nil, category: String? = nil, portionPricing: PortionPricing, isActive: Bool) async throws {
+        print("🔄 Updating ingredient template \(id)...")
+
+        struct UpdatePayload: Encodable {
+            let name: String?
+            let category: String?
+            let portion_pricing: PortionPricing
+            let is_active: Bool
+        }
+
+        let payload = UpdatePayload(
+            name: name,
+            category: category,
+            portion_pricing: portionPricing,
+            is_active: isActive
+        )
+
+        try await client
+            .from("ingredient_templates")
+            .update(payload)
+            .eq("id", value: id)
+            .execute()
+
+        print("✅ Ingredient template \(id) updated successfully")
+    }
+
+    /// Create new ingredient template
+    func createIngredientTemplate(
+        name: String,
+        category: String,
+        portionPricing: PortionPricing,
+        defaultPortion: String = "regular",
+        displayOrder: Int
+    ) async throws {
+        print("🔄 Creating ingredient template '\(name)'...")
+
+        struct CreatePayload: Encodable {
+            let name: String
+            let category: String
+            let supports_portions: Bool
+            let portion_pricing: PortionPricing
+            let default_portion: String
+            let display_order: Int
+            let is_active: Bool
+        }
+
+        let payload = CreatePayload(
+            name: name,
+            category: category,
+            supports_portions: true,
+            portion_pricing: portionPricing,
+            default_portion: defaultPortion,
+            display_order: displayOrder,
+            is_active: true
+        )
+
+        try await client
+            .from("ingredient_templates")
+            .insert(payload)
+            .execute()
+
+        print("✅ Ingredient template '\(name)' created successfully")
+    }
+
+    /// Delete ingredient template
+    func deleteIngredientTemplate(id: Int) async throws {
+        print("🔄 Deleting ingredient template \(id)...")
+
+        try await client
+            .from("ingredient_templates")
+            .delete()
+            .eq("id", value: id)
+            .execute()
+
+        print("✅ Ingredient template \(id) deleted successfully")
+    }
+
+    /// Toggle ingredient template active status
+    func toggleIngredientActive(id: Int, isActive: Bool) async throws {
+        print("🔄 Setting ingredient \(id) active: \(isActive)...")
+
+        struct TogglePayload: Encodable {
+            let is_active: Bool
+        }
+
+        try await client
+            .from("ingredient_templates")
+            .update(TogglePayload(is_active: isActive))
+            .eq("id", value: id)
+            .execute()
+
+        print("✅ Ingredient \(id) active status updated to: \(isActive)")
+    }
 }

@@ -13,6 +13,7 @@ struct MenuManagementView: View {
     @State private var showAddItem = false
     @State private var itemToEdit: MenuItem?
     @State private var appError: AppError?
+    @State private var showIngredientManagement = false
 
     // Filtered menu items based on selected category
     var filteredItems: [MenuItem] {
@@ -99,12 +100,20 @@ struct MenuManagementView: View {
             }
             .navigationTitle("Menu Management")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { showIngredientManagement = true }) {
+                        Label("Ingredients", systemImage: "leaf.fill")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showAddItem = true }) {
                         Image(systemName: "plus")
                             .fontWeight(.semibold)
                     }
                 }
+            }
+            .fullScreenCover(isPresented: $showIngredientManagement) {
+                IngredientManagementView()
             }
             .sheet(isPresented: $showAddItem) {
                 AddMenuItemView(onSave: { updatedItem in

@@ -85,12 +85,22 @@ export const PortionSelectorRow = ({
   showPrices = false,
   disabled = false,
 }: PortionSelectorCompactProps) => {
+  // Check if this ingredient has any pricing
+  const hasPricing = pricing && (pricing.light > 0 || pricing.regular > 0 || pricing.extra > 0);
+
   return (
     <div className="flex items-center gap-4 py-2">
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate">{ingredientName}</p>
+        <div className="flex items-center gap-2">
+          <p className="font-medium truncate">{ingredientName}</p>
+          {hasPricing && (
+            <span className="text-[10px] font-bold text-purple-600 px-1.5 py-0.5 bg-purple-100 rounded">
+              $
+            </span>
+          )}
+        </div>
         {showPrices && pricing && pricing[value] > 0 && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-green-600 font-medium">
             +${pricing[value].toFixed(2)}
           </p>
         )}
@@ -99,7 +109,7 @@ export const PortionSelectorRow = ({
         value={value}
         onChange={onChange}
         pricing={pricing}
-        showPrices={false}
+        showPrices={showPrices}
         disabled={disabled}
         className="flex-shrink-0"
       />

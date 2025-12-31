@@ -26,9 +26,12 @@ struct SignUpView: View {
                     VStack(spacing: Spacing.xl) {
                         // Header
                         VStack(spacing: Spacing.md) {
-                            Image(systemName: "fork.knife.circle.fill")
-                                .font(.system(size: 80))
-                                .foregroundColor(.brandPrimary)
+                            Image("BrandLogo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 80, height: 80)
+                                .clipShape(RoundedRectangle(cornerRadius: 18))
+                                .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
 
                             Text("Create Account")
                                 .font(AppFonts.largeTitle)

@@ -11,6 +11,7 @@ import SwiftUI
 struct KnockBitesBusinessApp: App {
     @ObservedObject private var authManager = AuthManager.shared
     @Environment(\.scenePhase) private var scenePhase
+    @State private var showSplash = true
 
     init() {
         // Test Supabase connection on app launch
@@ -21,26 +22,39 @@ struct KnockBitesBusinessApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if authManager.isLoading {
-                    // Loading screen while checking auth status
-                    LoadingScreen()
-                } else if authManager.isAuthenticated {
-                    // Show main dashboard when authenticated
-                    MainTabView()
-                        .environmentObject(authManager)
-                } else {
-                    // Show login screen when not authenticated
-                    StaffLoginView()
-                        .environmentObject(authManager)
+            ZStack {
+                Group {
+                    if authManager.isLoading {
+                        // Loading screen while checking auth status
+                        LoadingScreen()
+                    } else if authManager.isAuthenticated {
+                        // Show main dashboard when authenticated
+                        MainTabView()
+                            .environmentObject(authManager)
+                    } else {
+                        // Show login screen when not authenticated
+                        StaffLoginView()
+                            .environmentObject(authManager)
+                    }
                 }
-            }
-            .task {
-                // Check auth status on app launch
-                await authManager.checkAuthStatus()
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                handleScenePhaseChange(newPhase)
+                .task {
+                    // Check auth status on app launch
+                    await authManager.checkAuthStatus()
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    handleScenePhaseChange(newPhase)
+                }
+
+                // Splash screen overlay
+                if showSplash {
+                    SplashView {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showSplash = false
+                        }
+                    }
+                    .transition(.opacity)
+                    .zIndex(1)
+                }
             }
         }
     }
@@ -81,9 +95,12 @@ struct LoadingScreen: View {
             Color.surface.ignoresSafeArea()
 
             VStack(spacing: Spacing.lg) {
-                Image(systemName: "fork.knife.circle.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(.brandPrimary)
+                Image("KnockBitesLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
 
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .brandPrimary))

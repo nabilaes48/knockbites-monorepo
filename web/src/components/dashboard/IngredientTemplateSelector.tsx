@@ -77,7 +77,19 @@ export const IngredientTemplateSelector = ({
         .order('display_order');
 
       if (error) throw error;
-      setTemplates(data || []);
+
+      // Deduplicate templates by name and category (keep first occurrence)
+      const seen = new Set<string>();
+      const uniqueTemplates = (data || []).filter((template) => {
+        const key = `${template.name}-${template.category}`;
+        if (seen.has(key)) {
+          return false;
+        }
+        seen.add(key);
+        return true;
+      });
+
+      setTemplates(uniqueTemplates);
     } catch (err) {
       console.error('Error fetching templates:', err);
     } finally {

@@ -1,4 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from "react";
+import { useNavigate } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,7 @@ import {
   RefreshCw,
   Search,
   AlertCircle,
+  Settings2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
@@ -64,6 +66,7 @@ interface CategoryData {
 }
 
 export const MenuManagement = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [menuItems, setMenuItems] = useState<MenuItemData[]>([]);
   const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -381,10 +384,16 @@ export const MenuManagement = () => {
             Manage items and availability across all categories
           </p>
         </div>
-        <NeonButton onClick={() => setIsAddModalOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Item
-        </NeonButton>
+        <div className="flex gap-2">
+          <NeonButton variant="outline" onClick={() => navigate("/ingredients")} className="gap-2">
+            <Settings2 className="h-4 w-4" />
+            Ingredients
+          </NeonButton>
+          <NeonButton onClick={() => setIsAddModalOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Item
+          </NeonButton>
+        </div>
       </div>
 
       {/* Stats Cards */}

@@ -36,6 +36,7 @@ const SupabaseTest = lazy(() => import("./pages/SupabaseTest"));
 const PremiumAnalyticsPage = lazy(() => import("./pages/PremiumAnalyticsPage"));
 const SystemHealth = lazy(() => import("./pages/SystemHealth"));
 const SetPassword = lazy(() => import("./pages/SetPassword"));
+const IngredientManagement = lazy(() => import("./pages/IngredientManagement"));
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
                 <Route path="/supabase-test" element={<SupabaseTest />} />
                 <Route path="/analytics" element={<ProtectedRoute requiredPermission="analytics"><PremiumAnalyticsPage /></ProtectedRoute>} />
                 <Route path="/system-health" element={<ProtectedRoute requiredRole="super_admin"><SystemHealth /></ProtectedRoute>} />
+                <Route path="/ingredients" element={<ProtectedRoute requiredPermission="menu"><IngredientManagement /></ProtectedRoute>} />
                 <Route path="/set-password" element={<SetPassword />} />
                 <Route path="/reset-password" element={<SetPassword />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

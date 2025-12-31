@@ -11,14 +11,31 @@ struct IngredientRow: View {
     let customization: MenuItemCustomization
     @Binding var selectedPortion: PortionLevel
 
+    // Check if this ingredient has any pricing
+    private var hasPricing: Bool {
+        guard let pricing = customization.portionPricing else { return false }
+        return pricing.light > 0 || pricing.regular > 0 || pricing.extra > 0
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Ingredient Name on its own line
+            // Ingredient Name with premium indicator
             HStack {
                 Text(customization.name)
                     .font(AppFonts.body)
                     .fontWeight(.medium)
                     .foregroundColor(.textPrimary)
+
+                if hasPricing {
+                    Text("$")
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.purple)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.purple.opacity(0.15))
+                        .cornerRadius(4)
+                }
 
                 Spacer()
 
@@ -47,9 +64,23 @@ struct IngredientRow: View {
                             Text(portionShortName(portion))
                                 .font(.system(size: 10, weight: .semibold))
                                 .foregroundColor(selectedPortion == portion ? .white : .textPrimary)
+
+                            // Show price under each portion button if this ingredient has pricing
+                            if let pricing = customization.portionPricing, portion != .none {
+                                let price = pricing[portion]
+                                if price > 0 {
+                                    Text("+$\(price, specifier: "%.2f")")
+                                        .font(.system(size: 8, weight: .medium))
+                                        .foregroundColor(selectedPortion == portion ? .white.opacity(0.9) : .green)
+                                } else if hasPricing {
+                                    Text("Free")
+                                        .font(.system(size: 8, weight: .medium))
+                                        .foregroundColor(selectedPortion == portion ? .white.opacity(0.9) : .secondary)
+                                }
+                            }
                         }
                         .frame(maxWidth: .infinity)
-                        .frame(height: 50)
+                        .frame(height: hasPricing ? 62 : 50)
                         .background(selectedPortion == portion ? Color.brandPrimary : Color.surface)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
